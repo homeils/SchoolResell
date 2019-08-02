@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:id="@+id/pim_header"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="Orientation" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="我的"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/pim_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="帮助"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/pim_container"
+        android:layout_width="0dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pim_help"
+        tools:ignore="Orientation" />
+
+    <ImageView
+        android:id="@+id/pim_img"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pim_help" />
+
+    <TextView
+        android:id="@+id/pim_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="Name"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/pim_description"
+        app:layout_constraintLeft_toRightOf="@id/pim_img"
+        app:layout_constraintTop_toTopOf="@id/pim_container" />
+
+    <TextView
+        android:id="@+id/pim_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="Description"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/pim_container"
+        app:layout_constraintLeft_toRightOf="@id/pim_img"
+        app:layout_constraintTop_toBottomOf="@id/pim_name" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/pim_container_right"
+        app:layout_constraintBottom_toBottomOf="@id/pim_container"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/pim_container" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pim_recyclerview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pim_container" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

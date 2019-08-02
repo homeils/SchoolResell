@@ -1,0 +1,78 @@
+package com.renoside.schoolresell.Entity;
+
+import java.util.List;
+
+public class GoodsEntity {
+
+    public static final int GOODS_BANNER = 5001;
+    public static final int GOODS_NAME_PRICE = 5002;
+    public static final int GOODS_DESCRIPTION = 5003;
+    public static final int GOODS_LIST = 5004;
+
+    public int itemType;
+    private List<Object> goodsImgs;
+    private String goodsName;
+    private String goodsPrice;
+    private String goodsDescription;
+    private String goodsLikes;
+
+    public GoodsEntity(int itemType) {
+        this.itemType = itemType;
+    }
+
+    public int getSpanSize() {
+        switch (itemType) {
+            case GOODS_BANNER:
+                return 2;
+            case GOODS_NAME_PRICE:
+                return 2;
+            case GOODS_DESCRIPTION:
+                return 2;
+            case GOODS_LIST:
+                return 1;
+            default:
+                return -1;
+        }
+    }
+
+    public List<Object> getGoodsImgs() {
+        return goodsImgs;
+    }
+
+    public void setGoodsImgs(List<Object> goodsImgs) {
+        this.goodsImgs = goodsImgs;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getGoodsPrice() {
+        return goodsPrice;
+    }
+
+    public void setGoodsPrice(String goodsPrice) {
+        this.goodsPrice = goodsPrice;
+    }
+
+    public String getGoodsDescription() {
+        return goodsDescription;
+    }
+
+    public void setGoodsDescription(String goodsDescription) {
+        this.goodsDescription = goodsDescription;
+    }
+
+    public String getGoodsLikes() {
+        return goodsLikes;
+    }
+
+    public void setGoodsLikes(String goodsLikes) {
+        this.goodsLikes = goodsLikes;
+    }
+
+}

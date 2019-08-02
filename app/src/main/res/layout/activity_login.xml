@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/x1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.10" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/x2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.90" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/y1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/y2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.50" />
+
+    <LinearLayout
+        android:id="@+id/login_header"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="Orientation" />
+
+    <TextView
+        android:id="@+id/login_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:text="登录/注册"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/login_header"
+        app:layout_constraintLeft_toLeftOf="@id/login_header"
+        app:layout_constraintTop_toTopOf="@id/login_header" />
+
+    <TextView
+        android:id="@+id/login_protocol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
+        android:text="用户协议"
+        android:textColor="@color/white"
+        app:layout_constraintBaseline_toBaselineOf="@id/login_title"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/login_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/y2"
+        app:layout_constraintLeft_toLeftOf="@id/x1"
+        app:layout_constraintRight_toRightOf="@id/x2"
+        app:layout_constraintTop_toTopOf="@id/y1"
+        tools:ignore="Orientation" />
+
+    <com.renoside.inputbox.InputBox
+        android:id="@+id/login_username"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        app:ico_background="@drawable/login_username"
+        app:ico_size="30"
+        app:input_color="@color/gray"
+        app:is_clear="true"
+        app:layout_constraintBottom_toBottomOf="@id/login_line"
+        app:layout_constraintLeft_toLeftOf="@id/login_container"
+        app:layout_constraintRight_toRightOf="@id/login_container"
+        app:layout_constraintTop_toTopOf="@id/login_container"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <View
+        android:id="@+id/login_line"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/whiteSmoke"
+        app:layout_constraintBottom_toTopOf="@id/login_password"
+        app:layout_constraintLeft_toLeftOf="@id/login_container"
+        app:layout_constraintRight_toRightOf="@id/login_container"
+        app:layout_constraintTop_toBottomOf="@id/login_username" />
+
+    <com.renoside.inputbox.InputBox
+        android:id="@+id/login_password"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        app:ico_background="@drawable/login_password"
+        app:ico_size="30"
+        app:input_color="@color/gray"
+        app:is_password="true"
+        app:layout_constraintBottom_toBottomOf="@id/login_container"
+        app:layout_constraintLeft_toLeftOf="@id/login_container"
+        app:layout_constraintRight_toRightOf="@id/login_container"
+        app:layout_constraintTop_toBottomOf="@id/login_line" />
+
+    <TextView
+        android:id="@+id/login_hint1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请输入账号和密码"
+        app:layout_constraintBottom_toTopOf="@id/login_hint2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/y2"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/login_hint2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="如未注册"
+        app:layout_constraintBottom_toTopOf="@id/login_hint3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/login_hint1" />
+
+    <TextView
+        android:id="@+id/login_hint3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点击登录即注册"
+        app:layout_constraintBottom_toTopOf="@id/login_hint4"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/login_hint2" />
+
+    <TextView
+        android:id="@+id/login_hint4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="注册即代表您同意该软件的用户协议"
+        app:layout_constraintBottom_toTopOf="@id/login_go"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/login_hint3" />
+
+    <TextView
+        android:id="@+id/login_go"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@color/sandyBrown"
+        android:gravity="center"
+        android:text="登    录"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

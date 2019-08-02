@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".GoodsActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/goods_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="4dp"
+        app:cardCornerRadius="@dimen/dp_4"
+        app:layout_constraintDimensionRatio="2 : 3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/goods_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="3dp">
+
+            <ImageView
+                android:id="@+id/goods_list_img"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1 : 1"
+                app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
+                app:layout_constraintRight_toRightOf="@id/goods_list_container"
+                app:layout_constraintTop_toTopOf="@id/goods_list_container" />
+
+            <TextView
+                android:id="@+id/goods_list_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@id/goods_list_description"
+                app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
+                app:layout_constraintTop_toBottomOf="@id/goods_list_img" />
+
+            <TextView
+                android:id="@+id/goods_list_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/goods_list_hint1"
+                app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
+                app:layout_constraintTop_toBottomOf="@id/goods_list_title" />
+
+            <TextView
+                android:id="@+id/goods_list_hint1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="￥"
+                android:textColor="@color/sandyBrown"
+                app:layout_constraintBottom_toBottomOf="@id/goods_list_container"
+                app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
+                app:layout_constraintTop_toBottomOf="@id/goods_list_description" />
+
+            <TextView
+                android:id="@+id/goods_list_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
+                android:textColor="@color/sandyBrown"
+                android:textSize="18sp"
+                app:layout_constraintBaseline_toBaselineOf="@id/goods_list_hint1"
+                app:layout_constraintLeft_toRightOf="@id/goods_list_hint1" />
+
+            <TextView
+                android:id="@+id/goods_list_likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBaseline_toBaselineOf="@id/goods_list_hint1"
+                app:layout_constraintRight_toLeftOf="@id/goods_list_hint2" />
+
+            <TextView
+                android:id="@+id/goods_list_hint2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="人想要"
+                app:layout_constraintBaseline_toBaselineOf="@id/goods_list_hint1"
+                app:layout_constraintRight_toRightOf="@id/goods_list_container" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

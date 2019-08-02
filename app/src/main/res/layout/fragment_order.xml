@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:id="@+id/order_header"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="Orientation" />
+
+    <TextView
+        android:id="@+id/order_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="我的订单"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="@id/order_header"
+        app:layout_constraintTop_toTopOf="@id/order_header"
+        app:layout_constraintBottom_toBottomOf="@id/order_header"/>
+
+    <TextView
+        android:id="@+id/order_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:padding="8dp"
+        android:text="搜索"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/order_title"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/order_recyclerview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/order_complete"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/order_title" />
+
+    <LinearLayout
+        android:id="@+id/order_footer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/order_recyclerview"
+        tools:ignore="Orientation" />
+
+    <TextView
+        android:id="@+id/order_sell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="我在卖的"
+        android:textColor="@color/white"
+        app:layout_constraintBaseline_toBaselineOf="@id/order_complete"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/order_complete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="一键完成"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/order_footer" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

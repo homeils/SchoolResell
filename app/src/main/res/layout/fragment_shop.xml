@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+    <LinearLayout
+        android:id="@+id/shop_header"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@color/sandyBrown"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="Orientation" />
+
+    <com.renoside.searchbox.SearchBox
+        android:id="@+id/shop_search"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:input_hint="请输入搜索关键字..."
+        app:layout_constraintBottom_toBottomOf="@id/shop_header"
+        app:layout_constraintLeft_toLeftOf="@id/shop_header"
+        app:layout_constraintRight_toLeftOf="@id/shop_ok"
+        app:layout_constraintTop_toTopOf="@id/shop_header"
+        app:left_ico="@drawable/search"
+        app:right_ico="@drawable/shop_sell" />
+
+    <TextView
+        android:id="@+id/shop_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="搜索"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/shop_header"
+        app:layout_constraintLeft_toRightOf="@id/shop_search"
+        app:layout_constraintRight_toRightOf="@id/shop_header"
+        app:layout_constraintTop_toTopOf="@id/shop_header" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/shop_recyclerview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/shop_search" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
