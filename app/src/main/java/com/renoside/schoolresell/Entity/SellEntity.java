@@ -7,18 +7,18 @@ public class SellEntity {
     public static final int SELL_PIC_ITEM = 6003;
     public int itemType;
 
-    private String sellhint;
+    private String sellHint;
 
     public SellEntity(int itemType) {
         this.itemType = itemType;
     }
 
-    public String getSellhint() {
-        return sellhint;
+    public String getSellHint() {
+        return sellHint;
     }
 
-    public void setSellhint(String sellhint) {
-        this.sellhint = sellhint;
+    public void setSellHint(String sellHint) {
+        this.sellHint = sellHint;
     }
 
 }

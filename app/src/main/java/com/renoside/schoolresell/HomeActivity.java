@@ -2,6 +2,7 @@ package com.renoside.schoolresell;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -62,6 +63,15 @@ public class HomeActivity extends AppCompatActivity {
          * 2秒之后隐藏Tab
          */
         hideTab();
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return false;
     }
 
     private void start() {

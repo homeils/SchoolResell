@@ -16,4 +16,9 @@
         <item name="android:textColorSecondary">@color/gray</item>
     </style>
 
+    <!-- 自定义启动图片主题 -->
+    <style name="AppCustomBackground" parent="AppTheme">
+        <item name="android:windowBackground">@mipmap/application_background</item>
+    </style>
+
 </resources>

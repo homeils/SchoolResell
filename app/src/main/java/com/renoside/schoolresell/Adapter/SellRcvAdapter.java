@@ -32,10 +32,10 @@ public class SellRcvAdapter extends BaseQuickAdapter<SellEntity, BaseViewHolder>
     protected void convert(@NonNull BaseViewHolder helper, SellEntity item) {
         switch (helper.getItemViewType()) {
             case SellEntity.SELL_SMALL_ITEM:
-                helper.setText(R.id.sell_small_hint, item.getSellhint());
+                helper.setText(R.id.sell_small_hint, item.getSellHint());
                 break;
             case SellEntity.SELL_BIG_ITEM:
-                helper.setText(R.id.sell_big_hint, item.getSellhint());
+                helper.setText(R.id.sell_big_hint, item.getSellHint());
                 break;
             case SellEntity.SELL_PIC_ITEM:
                 break;
