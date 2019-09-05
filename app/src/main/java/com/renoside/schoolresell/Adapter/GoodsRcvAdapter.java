@@ -40,12 +40,6 @@ public class GoodsRcvAdapter extends BaseQuickAdapter<GoodsEntity, BaseViewHolde
         switch (helper.getItemViewType()) {
             case GoodsEntity.GOODS_BANNER:
                 Banner banner = helper.getView(R.id.goods_banner);
-                List<Integer> images = new ArrayList<>();
-                images.add(R.drawable.banner_1);
-                images.add(R.drawable.banner_2);
-                images.add(R.drawable.banner_3);
-                images.add(R.drawable.banner_4);
-                images.add(R.drawable.banner_5);
                 banner.setImageLoader(new ImageLoader() {
                     @Override
                     public void conImageLoader(Context context, Object path, ImageView imageView) {
@@ -54,8 +48,15 @@ public class GoodsRcvAdapter extends BaseQuickAdapter<GoodsEntity, BaseViewHolde
                 });
                 banner.setPointSize(20);
                 banner.setRelay(2000);
-                banner.setImages(images);
+                banner.setImages(item.getGoodsImgs());
                 banner.start();
+//                Banner banner = helper.getView(R.id.goods_banner);
+//                banner.setImages(item.getGoodsImgs()).setImageLoader(new ImageLoader() {
+//                    @Override
+//                    public void displayImage(Context context, Object path, ImageView imageView) {
+//                        Glide.with(mContext).load(path).into(imageView);
+//                    }
+//                }).start();
                 break;
             case GoodsEntity.GOODS_NAME_PRICE:
                 helper.setText(R.id.goods_item_name, item.getGoodsName());
@@ -65,6 +66,7 @@ public class GoodsRcvAdapter extends BaseQuickAdapter<GoodsEntity, BaseViewHolde
                 helper.setText(R.id.goods_item_description, item.getGoodsDescription());
                 break;
             case GoodsEntity.GOODS_LIST:
+                Glide.with(mContext).load(item.getGoodsImg()).into((ImageView) helper.getView(R.id.goods_list_img));
                 helper.setText(R.id.goods_list_title, item.getGoodsName());
                 helper.setText(R.id.goods_list_description, item.getGoodsDescription());
                 helper.setText(R.id.goods_list_price, item.getGoodsPrice());

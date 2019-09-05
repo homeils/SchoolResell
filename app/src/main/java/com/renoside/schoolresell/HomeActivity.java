@@ -65,6 +65,12 @@ public class HomeActivity extends AppCompatActivity {
         hideTab();
     }
 
+    /**
+     * 返回直接隐藏程序
+     * @param keyCode
+     * @param event
+     * @return
+     */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

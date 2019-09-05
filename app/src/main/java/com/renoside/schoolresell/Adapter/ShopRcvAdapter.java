@@ -84,24 +84,26 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
                 shopRecommendHintRight.setText("换一批");
                 break;
             case ShopEntity.SHOP_RECOMMEND:
+                Glide.with(mContext).load(item.getShopImg()).into((ImageView) helper.getView(R.id.shop_recommend_img));
                 TextView shopRecommendTitle = helper.getView(R.id.shop_recommend_title);
-                shopRecommendTitle.setText("这是推荐列表");
+                shopRecommendTitle.setText(item.getShopTitle());
                 TextView shopRecommendLikes = helper.getView(R.id.shop_recommend_likes);
-                shopRecommendLikes.setText("999");
+                shopRecommendLikes.setText(item.getShopLikes());
                 break;
             case ShopEntity.SHOP_GOODS_HINT:
                 TextView shopGoodsHintLeft = helper.getView(R.id.shop_hint_left);
                 shopGoodsHintLeft.setText("全部商品");
                 break;
             case ShopEntity.SHOP_GOODS:
+                Glide.with(mContext).load(item.getShopImg()).into((ImageView) helper.getView(R.id.shop_goods_img));
                 TextView shopGoodsTitle = helper.getView(R.id.shop_goods_title);
-                shopGoodsTitle.setText("这是商品列表");
+                shopGoodsTitle.setText(item.getShopTitle());
                 TextView shopGoodsDescription = helper.getView(R.id.shop_goods_description);
-                shopGoodsDescription.setText("描述");
+                shopGoodsDescription.setText(item.getShopDescription());
                 TextView shopGoodsPrice = helper.getView(R.id.shop_goods_price);
-                shopGoodsPrice.setText("999.9");
+                shopGoodsPrice.setText(item.getShopPrice());
                 TextView shopGoodsLikes = helper.getView(R.id.shop_goods_likes);
-                shopGoodsLikes.setText("999");
+                shopGoodsLikes.setText(item.getShopLikes());
                 break;
             default:
                 break;

@@ -10,7 +10,9 @@ public class GoodsEntity {
     public static final int GOODS_LIST = 5004;
 
     public int itemType;
+    private String goodsId;
     private List<Object> goodsImgs;
+    private Object goodsImg;
     private String goodsName;
     private String goodsPrice;
     private String goodsDescription;
@@ -35,12 +37,28 @@ public class GoodsEntity {
         }
     }
 
+    public String getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(String goodsId) {
+        this.goodsId = goodsId;
+    }
+
     public List<Object> getGoodsImgs() {
         return goodsImgs;
     }
 
     public void setGoodsImgs(List<Object> goodsImgs) {
         this.goodsImgs = goodsImgs;
+    }
+
+    public Object getGoodsImg() {
+        return goodsImg;
+    }
+
+    public void setGoodsImg(Object goodsImg) {
+        this.goodsImg = goodsImg;
     }
 
     public String getGoodsName() {

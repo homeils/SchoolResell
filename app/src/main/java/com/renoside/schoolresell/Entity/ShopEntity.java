@@ -14,6 +14,10 @@ public class ShopEntity {
      */
     public int itemType;
     /**
+     * 商品ID
+     */
+    private String shopId;
+    /**
      * 轮播图片地址集合
      */
     private String shopImgs;
@@ -63,6 +67,14 @@ public class ShopEntity {
             default:
                 return -1;
         }
+    }
+
+    public String getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
     }
 
     public String getShopImgs() {

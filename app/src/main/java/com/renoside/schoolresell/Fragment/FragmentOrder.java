@@ -13,10 +13,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.renoside.schoolresell.Adapter.OrderRcvAdapter;
+import com.renoside.schoolresell.Bean.Order;
 import com.renoside.schoolresell.Entity.OrderEntity;
 import com.renoside.schoolresell.PutActivity;
 import com.renoside.schoolresell.R;
+import com.renoside.schoolresell.Utils.ApiUrl;
+import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +47,11 @@ public class FragmentOrder extends Fragment {
     TextView orderComplete;
     public Unbinder bind;
 
+    private OrderRcvAdapter rcvAdapter;
     /**
      * 定义数据集合
      */
-    private List<OrderEntity> dataList;
+    private List<OrderEntity> dataList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -55,7 +65,7 @@ public class FragmentOrder extends Fragment {
         /**
          * 创建并设置适配器
          */
-        OrderRcvAdapter rcvAdapter = new OrderRcvAdapter(R.layout.order_item, dataList);
+        rcvAdapter = new OrderRcvAdapter(R.layout.order_item, dataList);
         orderRecyclerview.setAdapter(rcvAdapter);
         /**
          * 设置线性垂直布局管理器
@@ -80,14 +90,26 @@ public class FragmentOrder extends Fragment {
     }
 
     private void setDataList() {
-        dataList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            OrderEntity orderEntity = new OrderEntity();
-            orderEntity.setOrderTitle("标题");
-            orderEntity.setOrderDescription("描述");
-            orderEntity.setOrderTime("2019-7-28");
-            dataList.add(orderEntity);
-        }
+        OkGo.<String>get(ApiUrl.url+"/order/"+ SharedPreferencesUtils.getUserLoginInfo(getContext()).get("userId"))
+                .headers("token", String.valueOf(SharedPreferencesUtils.getIsFirstLogin(getContext()).get("token")))
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        dataList.clear();
+                        JSONObject jsonObject = JSON.parseObject(response.body());
+                        Order orderObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Order>(){});
+                        if (orderObject != null){
+                            for (int i = 0; i < orderObject.getGoods().size(); i++) {
+                                OrderEntity orderEntity = new OrderEntity();
+                                orderEntity.setOrderTitle(orderObject.getGoods().get(i).getGoodsName());
+                                orderEntity.setOrderDescription(orderObject.getGoods().get(i).getGoodsDescription());
+                                orderEntity.setOrderTime(orderObject.getGoods().get(i).getGoodsAddress());
+                                dataList.add(orderEntity);
+                            }
+                        }
+                        rcvAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
 }
