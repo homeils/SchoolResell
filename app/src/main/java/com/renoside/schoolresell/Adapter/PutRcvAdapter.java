@@ -24,7 +24,8 @@ public class PutRcvAdapter extends BaseQuickAdapter<PutEntity, BaseViewHolder> {
         Glide.with(mContext).load(item.getPutImg()).into((ImageView) helper.getView(R.id.put_item_img));
         helper.setText(R.id.put_item_title, item.getPutTitle());
         helper.setText(R.id.put_item_description, item.getPutDescription());
-        helper.setText(R.id.put_item_time, item.getPutTime());
+        helper.setText(R.id.put_item_status, item.getPutStatus());
+        helper.addOnClickListener(R.id.put_item_operation);
     }
 
 }

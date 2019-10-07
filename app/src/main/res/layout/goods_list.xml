@@ -47,6 +47,7 @@
                 android:id="@+id/goods_list_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
                 app:layout_constraintBottom_toTopOf="@id/goods_list_hint1"
                 app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
                 app:layout_constraintTop_toBottomOf="@id/goods_list_title" />

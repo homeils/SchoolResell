@@ -2,11 +2,20 @@ package com.renoside.schoolresell.Entity;
 
 public class OrderEntity {
 
+    private String goodsId;
     private String orderImg;
     private String orderTitle;
     private String orderDescription;
     private String orderTime;
     private String orderStatus;
+
+    public String getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(String goodsId) {
+        this.goodsId = goodsId;
+    }
 
     public String getOrderImg() {
         return orderImg;

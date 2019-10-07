@@ -96,6 +96,40 @@ public class GoodsActivity extends AppCompatActivity {
     private void setDataList() {
         dataList.clear();
         /**
+         * 请求添加商品列表数据
+         */
+        Handler loadGoodsList = new Handler() {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 200:
+                        OkGo.<String>get(ApiUrl.url + "/goods")
+                                .execute(new StringCallback() {
+                                    @Override
+                                    public void onSuccess(Response<String> response) {
+                                        JSONObject jsonObject = JSON.parseObject(response.body());
+                                        Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
+                                        });
+                                        for (int i = 0; i < goodsObject.getGoods().size(); i++) {
+                                            if (!goodsId.equals(goodsObject.getGoods().get(i).getGoodsId())) {
+                                                GoodsEntity goods = new GoodsEntity(GoodsEntity.GOODS_LIST);
+                                                goods.setGoodsId(goodsObject.getGoods().get(i).getGoodsId());
+                                                goods.setGoodsImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                                goods.setGoodsName(goodsObject.getGoods().get(i).getGoodsName());
+                                                goods.setGoodsDescription(goodsObject.getGoods().get(i).getGoodsDescription());
+                                                goods.setGoodsPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
+                                                goods.setGoodsLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
+                                                dataList.add(goods);
+                                            }
+                                        }
+                                        rcvAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                        break;
+                }
+            }
+        };
+        /**
          * 加载商品详情数据
          */
         OkGo.<String>get(ApiUrl.url + "/goods/" + goodsId)
@@ -127,34 +161,9 @@ public class GoodsActivity extends AppCompatActivity {
                             description.setGoodsDescription(goodsInfo.getGoodsDescription());
                         }
                         dataList.add(description);
-                        rcvAdapter.notifyDataSetChanged();
-                    }
-                });
-        /**
-         * 请求添加商品列表数据
-         */
-        OkGo.<String>get(ApiUrl.url + "/goods")
-                .execute(new StringCallback() {
-                    @Override
-                    public void onSuccess(Response<String> response) {
-                        JSONObject jsonObject = JSON.parseObject(response.body());
-                        Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
-                        });
-                        for (int i = 0; i < goodsObject.getGoods().size(); i++) {
-                            if (goodsId == goodsObject.getGoods().get(i).getGoodsId()) {
-                                goodsObject.getGoods().remove(i);
-                            }
-                        }
-                        for (int i = 0; i < goodsObject.getGoods().size(); i++) {
-                            GoodsEntity goods = new GoodsEntity(GoodsEntity.GOODS_LIST);
-                            goods.setGoodsId(goodsObject.getGoods().get(i).getGoodsId());
-                            goods.setGoodsImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
-                            goods.setGoodsName(goodsObject.getGoods().get(i).getGoodsName());
-                            goods.setGoodsDescription(goodsObject.getGoods().get(i).getGoodsDescription());
-                            goods.setGoodsPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
-                            goods.setGoodsLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
-                            dataList.add(goods);
-                        }
+                        Message msg = new Message();
+                        msg.what = 200;
+                        loadGoodsList.sendMessage(msg);
                         rcvAdapter.notifyDataSetChanged();
                     }
                 });
@@ -208,7 +217,7 @@ public class GoodsActivity extends AppCompatActivity {
                             .execute(new StringCallback() {
                                 @Override
                                 public void onSuccess(Response<String> response) {
-                                    Log.d("response:", response.body());
+                                    pd2.cancel();
                                     Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
                                     toast.setText("下单成功");
                                     toast.show();

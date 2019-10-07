@@ -2,11 +2,20 @@ package com.renoside.schoolresell.Entity;
 
 public class PutEntity {
 
+    private String goodsId;
     private String putImg;
     private String putTitle;
     private String putDescription;
-    private String putTime;
     private String putStatus;
+    private String putOperation;
+
+    public String getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(String goodsId) {
+        this.goodsId = goodsId;
+    }
 
     public String getPutImg() {
         return putImg;
@@ -32,20 +41,20 @@ public class PutEntity {
         this.putDescription = putDescription;
     }
 
-    public String getPutTime() {
-        return putTime;
-    }
-
-    public void setPutTime(String putTime) {
-        this.putTime = putTime;
-    }
-
     public String getPutStatus() {
         return putStatus;
     }
 
     public void setPutStatus(String putStatus) {
         this.putStatus = putStatus;
+    }
+
+    public String getPutOperation() {
+        return putOperation;
+    }
+
+    public void setPutOperation(String putOperation) {
+        this.putOperation = putOperation;
     }
 
 }

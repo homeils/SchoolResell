@@ -14,9 +14,19 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.bumptech.glide.Glide;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.renoside.schoolresell.Adapter.PIMRcvAdapter;
+import com.renoside.schoolresell.Bean.UserInfo;
 import com.renoside.schoolresell.Entity.PIMEntity;
 import com.renoside.schoolresell.R;
+import com.renoside.schoolresell.Utils.ApiUrl;
+import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +92,21 @@ public class FragmentPIM extends Fragment {
     }
 
     private void setDataList() {
+        /**
+         * 设置用户基本信息
+         */
+        OkGo.<String>get(ApiUrl.url+"/user/"+ SharedPreferencesUtils.getUserLoginInfo(getContext()).get("userId"))
+                .headers("token", SharedPreferencesUtils.getUserLoginInfo(getContext()).get("token"))
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        JSONObject jsonObject = JSON.parseObject(response.body());
+                        UserInfo userInfo = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<UserInfo>(){});
+                        Glide.with(getContext()).load(userInfo.getUserImg()).into(pimImg);
+                        pimName.setText(userInfo.getUserName());
+                        pimDescription.setText(userInfo.getUserDescription());
+                    }
+                });
         dataList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             PIMEntity pimItem = new PIMEntity(PIMEntity.PIM_ITEM);

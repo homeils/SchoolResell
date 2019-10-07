@@ -24,7 +24,8 @@ public class OrderRcvAdapter extends BaseQuickAdapter<OrderEntity, BaseViewHolde
         Glide.with(mContext).load(item.getOrderImg()).into((ImageView) helper.getView(R.id.order_item_img));
         helper.setText(R.id.order_item_title, item.getOrderTitle());
         helper.setText(R.id.order_item_description, item.getOrderDescription());
-        helper.setText(R.id.order_item_time, item.getOrderTime());
+        helper.setText(R.id.order_item_status, item.getOrderStatus());
+        helper.addOnClickListener(R.id.order_item_operation);
     }
 
 }

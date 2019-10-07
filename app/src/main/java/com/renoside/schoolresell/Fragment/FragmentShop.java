@@ -117,56 +117,58 @@ public class FragmentShop extends Fragment {
                         JSONObject jsonObject = JSON.parseObject(response.body());
                         Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
                         });
-                        /**
-                         * 轮播数据
-                         */
-                        ShopEntity banner = new ShopEntity(ShopEntity.SHOP_BANNER);
-                        dataList.add(banner);
-                        /**
-                         * 导航通道数据
-                         */
-                        for (int i = 0; i < 5; i++) {
-                            ShopEntity channel = new ShopEntity(ShopEntity.SHOP_CHANNEL);
-                            channel.setShopImg(shopChannelImgs[i]);
-                            channel.setShopTitle(shopChannelTitles[i]);
-                            dataList.add(channel);
+                        if (goodsObject != null && goodsObject.getGoods() != null && goodsObject.getGoods().size() != 0) {
+                            /**
+                             * 轮播数据
+                             */
+                            ShopEntity banner = new ShopEntity(ShopEntity.SHOP_BANNER);
+                            dataList.add(banner);
+                            /**
+                             * 导航通道数据
+                             */
+                            for (int i = 0; i < 5; i++) {
+                                ShopEntity channel = new ShopEntity(ShopEntity.SHOP_CHANNEL);
+                                channel.setShopImg(shopChannelImgs[i]);
+                                channel.setShopTitle(shopChannelTitles[i]);
+                                dataList.add(channel);
+                            }
+                            /**
+                             * 热门推荐提示
+                             */
+                            ShopEntity recommendHint = new ShopEntity(ShopEntity.SHOP_RECOMMEND_HINT);
+                            dataList.add(recommendHint);
+                            /**
+                             * 推荐数据
+                             */
+                            for (int i = 0; i < 4; i++) {
+                                ShopEntity recommend = new ShopEntity(ShopEntity.SHOP_RECOMMEND);
+                                recommend.setShopImg(goodsObject.getGoods().get(0).getGoodsImgs().get(0).getGoodsImg());
+                                recommend.setShopTitle(goodsObject.getGoods().get(0).getGoodsName());
+                                recommend.setShopDescription(goodsObject.getGoods().get(0).getGoodsDescription());
+                                recommend.setShopPrice(String.valueOf(goodsObject.getGoods().get(0).getGoodsPrice()));
+                                recommend.setShopLikes(String.valueOf(goodsObject.getGoods().get(0).getGoodsLikes()));
+                                dataList.add(recommend);
+                            }
+                            /**
+                             * 商品列表提示
+                             */
+                            ShopEntity goodsHint = new ShopEntity(ShopEntity.SHOP_GOODS_HINT);
+                            dataList.add(goodsHint);
+                            /**
+                             * 商品列表数据
+                             */
+                            for (int i = 0; i < goodsObject.getGoods().size(); i++) {
+                                ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
+                                goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
+                                goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
+                                goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
+                                goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
+                                goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
+                                dataList.add(goods);
+                            }
+                            rcvAdapter.notifyDataSetChanged();
                         }
-                        /**
-                         * 热门推荐提示
-                         */
-                        ShopEntity recommendHint = new ShopEntity(ShopEntity.SHOP_RECOMMEND_HINT);
-                        dataList.add(recommendHint);
-                        /**
-                         * 推荐数据
-                         */
-                        for (int i = 0; i < 4; i++) {
-                            ShopEntity recommend = new ShopEntity(ShopEntity.SHOP_RECOMMEND);
-                            recommend.setShopImg(goodsObject.getGoods().get(0).getGoodsImgs().get(0).getGoodsImg());
-                            recommend.setShopTitle(goodsObject.getGoods().get(0).getGoodsName());
-                            recommend.setShopDescription(goodsObject.getGoods().get(0).getGoodsDescription());
-                            recommend.setShopPrice(String.valueOf(goodsObject.getGoods().get(0).getGoodsPrice()));
-                            recommend.setShopLikes(String.valueOf(goodsObject.getGoods().get(0).getGoodsLikes()));
-                            dataList.add(recommend);
-                        }
-                        /**
-                         * 商品列表提示
-                         */
-                        ShopEntity goodsHint = new ShopEntity(ShopEntity.SHOP_GOODS_HINT);
-                        dataList.add(goodsHint);
-                        /**
-                         * 商品列表数据
-                         */
-                        for (int i = 0; i < goodsObject.getGoods().size(); i++) {
-                            ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
-                            goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
-                            goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
-                            goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
-                            goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
-                            goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
-                            goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
-                            dataList.add(goods);
-                        }
-                        rcvAdapter.notifyDataSetChanged();
                     }
                 });
     }
