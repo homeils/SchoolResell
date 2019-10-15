@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="mysteriousBlue">#1E90FF</color>
+    <!--<color name="mysteriousBlue">#1E90FF</color>-->
     <color name="whiteSmoke">#F5F5F5</color>
     <color name="gray">#808080</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
-    <color name="sandyBrown">#F4A460</color>
+    <color name="auqamarin">#7FFFAA</color>
 </resources>

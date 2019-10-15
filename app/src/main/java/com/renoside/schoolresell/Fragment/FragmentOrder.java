@@ -27,7 +27,7 @@ import com.renoside.schoolresell.Entity.OrderEntity;
 import com.renoside.schoolresell.PutActivity;
 import com.renoside.schoolresell.R;
 import com.renoside.schoolresell.Utils.ApiUrl;
-import com.renoside.schoolresell.Utils.PopupWindowUtil;
+import com.renoside.schoolresell.Utils.IndentPopWindowUtil;
 import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
@@ -46,8 +46,8 @@ public class FragmentOrder extends Fragment {
     RecyclerView orderRecyclerview;
     @BindView(R.id.order_sell)
     TextView orderSell;
-    @BindView(R.id.order_complete)
-    TextView orderComplete;
+//    @BindView(R.id.order_complete)
+//    TextView orderComplete;
     public Unbinder bind;
 
     private OrderRcvAdapter rcvAdapter;
@@ -122,6 +122,9 @@ public class FragmentOrder extends Fragment {
                             }
                             rcvAdapter.notifyDataSetChanged();
                         }
+                        if (response.code() == 200) {
+                            rcvAdapter.notifyDataSetChanged();
+                        }
                     }
                 });
     }
@@ -133,11 +136,11 @@ public class FragmentOrder extends Fragment {
         rcvAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                PopupWindowUtil.showPopupWindow(getActivity(), getContext(), view, (dataList.get(position).getOrderStatus().equals("交易中") ? 10021 : 1003));
+                IndentPopWindowUtil.showPopupWindow(getActivity(), getContext(), view, (dataList.get(position).getOrderStatus().equals("交易中") ? 10021 : 1003));
                 /**
                  * 确认收货按钮
                  */
-                PopupWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
+                IndentPopWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         OkGo.<String>put(ApiUrl.url + "/order/" + dataList.get(position).getGoodsId())
@@ -149,6 +152,7 @@ public class FragmentOrder extends Fragment {
                                         Toast toast = Toast.makeText(getContext(), null, Toast.LENGTH_SHORT);
                                         toast.setText("确认收货成功，感谢使用！");
                                         toast.show();
+                                        IndentPopWindowUtil.popWindow.dismiss();
                                         setDataList();
                                     }
                                 });
@@ -157,7 +161,7 @@ public class FragmentOrder extends Fragment {
                 /**
                  * 取消订单按钮
                  */
-                PopupWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
+                IndentPopWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         OkGo.<String>delete(ApiUrl.url + "/order/" + dataList.get(position).getGoodsId())
@@ -169,6 +173,7 @@ public class FragmentOrder extends Fragment {
                                         Toast toast = Toast.makeText(getContext(), null, Toast.LENGTH_SHORT);
                                         toast.setText("你已成功取消订单！");
                                         toast.show();
+                                        IndentPopWindowUtil.popWindow.dismiss();
                                         setDataList();
                                     }
                                 });

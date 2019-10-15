@@ -11,8 +11,9 @@ import android.widget.TextView;
 
 import com.renoside.schoolresell.R;
 
-public class PopupWindowUtil {
+public class IndentPopWindowUtil {
 
+    public static PopupWindow popWindow;
     public static TextView popOkOrder;
     public static TextView popChannelOrder;
     public static TextView popCompleted;
@@ -27,8 +28,8 @@ public class PopupWindowUtil {
      */
     public static void showPopupWindow(Activity activity, Context context, View view, int status) {
         // 加载PopupWindow的布局
-        View inflate = View.inflate(context, R.layout.popwindow, null);
-        PopupWindow popWindow = new PopupWindow(inflate, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+        View inflate = View.inflate(context, R.layout.popwindow_indent, null);
+        popWindow = new PopupWindow(inflate, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
         popWindow.setBackgroundDrawable(new ColorDrawable(0));
         popOkOrder = inflate.findViewById(R.id.pop_ok_order);
         View popView1 = inflate.findViewById(R.id.pop_view1);
@@ -67,11 +68,18 @@ public class PopupWindowUtil {
             popChannelOrder.setVisibility(View.GONE);
             popCompleted.setVisibility(View.VISIBLE);
         }
+        TextView popChannel = inflate.findViewById(R.id.pop_channel);
         //点击空白位置，PopupWindow消失的事件监听，这时候让背景恢复正常
         popWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
                 backgroundAlpha(activity, 1.0f);
+            }
+        });
+        popChannel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popWindow.dismiss();
             }
         });
     }

@@ -138,16 +138,32 @@ public class FragmentShop extends Fragment {
                             ShopEntity recommendHint = new ShopEntity(ShopEntity.SHOP_RECOMMEND_HINT);
                             dataList.add(recommendHint);
                             /**
+                             * 热度排序
+                             */
+                            Goods sortedDataList = sortByLikes(goodsObject);
+                            /**
                              * 推荐数据
                              */
                             for (int i = 0; i < 4; i++) {
-                                ShopEntity recommend = new ShopEntity(ShopEntity.SHOP_RECOMMEND);
-                                recommend.setShopImg(goodsObject.getGoods().get(0).getGoodsImgs().get(0).getGoodsImg());
-                                recommend.setShopTitle(goodsObject.getGoods().get(0).getGoodsName());
-                                recommend.setShopDescription(goodsObject.getGoods().get(0).getGoodsDescription());
-                                recommend.setShopPrice(String.valueOf(goodsObject.getGoods().get(0).getGoodsPrice()));
-                                recommend.setShopLikes(String.valueOf(goodsObject.getGoods().get(0).getGoodsLikes()));
-                                dataList.add(recommend);
+                                if (goodsObject.getGoods().size() >= 4) {
+                                    ShopEntity recommend = new ShopEntity(ShopEntity.SHOP_RECOMMEND);
+                                    recommend.setShopId(sortedDataList.getGoods().get(i).getGoodsId());
+                                    recommend.setShopImg(sortedDataList.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                    recommend.setShopTitle(sortedDataList.getGoods().get(i).getGoodsName());
+                                    recommend.setShopDescription(sortedDataList.getGoods().get(i).getGoodsDescription());
+                                    recommend.setShopPrice(String.valueOf(sortedDataList.getGoods().get(i).getGoodsPrice()));
+                                    recommend.setShopLikes(String.valueOf(sortedDataList.getGoods().get(i).getGoodsLikes()));
+                                    dataList.add(recommend);
+                                } else {
+                                    ShopEntity recommend = new ShopEntity(ShopEntity.SHOP_RECOMMEND);
+                                    recommend.setShopId(sortedDataList.getGoods().get(0).getGoodsId());
+                                    recommend.setShopImg(goodsObject.getGoods().get(0).getGoodsImgs().get(0).getGoodsImg());
+                                    recommend.setShopTitle(goodsObject.getGoods().get(0).getGoodsName());
+                                    recommend.setShopDescription(goodsObject.getGoods().get(0).getGoodsDescription());
+                                    recommend.setShopPrice(String.valueOf(goodsObject.getGoods().get(0).getGoodsPrice()));
+                                    recommend.setShopLikes(String.valueOf(goodsObject.getGoods().get(0).getGoodsLikes()));
+                                    dataList.add(recommend);
+                                }
                             }
                             /**
                              * 商品列表提示
@@ -157,17 +173,26 @@ public class FragmentShop extends Fragment {
                             /**
                              * 商品列表数据
                              */
-                            for (int i = 0; i < goodsObject.getGoods().size(); i++) {
-                                ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
-                                goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
-                                goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
-                                goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
-                                goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
-                                goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
-                                goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
-                                dataList.add(goods);
-                            }
-                            rcvAdapter.notifyDataSetChanged();
+                            OkGo.<String>get(ApiUrl.url + "/goods")
+                                    .execute(new StringCallback() {
+                                        @Override
+                                        public void onSuccess(Response<String> response) {
+                                            JSONObject jsonObject = JSON.parseObject(response.body());
+                                            Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
+                                            });
+                                            for (int i = 0; i < goodsObject.getGoods().size(); i++) {
+                                                ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
+                                                goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
+                                                goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                                goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
+                                                goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
+                                                goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
+                                                goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
+                                                dataList.add(goods);
+                                            }
+                                            rcvAdapter.notifyDataSetChanged();
+                                        }
+                                    });
                         }
                     }
                 });
@@ -194,7 +219,7 @@ public class FragmentShop extends Fragment {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Toast.makeText(getContext(), "onItemClick" + position, Toast.LENGTH_SHORT).show();
-                if (position > 11) {
+                if ((position >= 7 && position < 11) || position > 11) {
                     Bundle bundle = new Bundle();
                     bundle.putString("goodsId", dataList.get(position).getShopId());
                     Message msg = new Message();
@@ -208,4 +233,23 @@ public class FragmentShop extends Fragment {
         });
     }
 
+    /**
+     * 热度排序
+     *
+     * @param goods
+     * @return
+     */
+    private Goods sortByLikes(Goods goods) {
+        Goods result = goods;
+        for (int i = 0; i < result.getGoods().size(); i++) {
+            for (int j = 0; j < result.getGoods().size() - 1 - i; j++) {
+                if (result.getGoods().get(j).getGoodsLikes() < result.getGoods().get(j + 1).getGoodsLikes()) {
+                    Goods.GoodsBean temp = result.getGoods().get(j);
+                    result.getGoods().set(j, result.getGoods().get(j + 1));
+                    result.getGoods().set(j + 1, temp);
+                }
+            }
+        }
+        return result;
+    }
 }

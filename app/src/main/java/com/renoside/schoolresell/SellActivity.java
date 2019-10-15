@@ -22,12 +22,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.renoside.schoolresell.Adapter.SellRcvAdapter;
+import com.renoside.schoolresell.Bean.GoodsInfo;
 import com.renoside.schoolresell.Entity.SellEntity;
 import com.renoside.schoolresell.Utils.ApiUrl;
 import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
@@ -57,6 +60,8 @@ public class SellActivity extends AppCompatActivity {
     ImageView sellHelp;
     @BindView(R.id.sell_ok)
     TextView sellOk;
+    @BindView(R.id.sell_title)
+    TextView sellTitle;
 
     private int flag;
     private List<SellEntity> dataList;
@@ -75,6 +80,7 @@ public class SellActivity extends AppCompatActivity {
         sellRecyclerview.setAdapter(rcvAdapter);
         LinearLayoutManager manager = new LinearLayoutManager(this);
         sellRecyclerview.setLayoutManager(manager);
+        isUpdate();
         initListener();
     }
 
@@ -105,6 +111,30 @@ public class SellActivity extends AppCompatActivity {
         dataList.add(address);
         SellEntity pic = new SellEntity(SellEntity.SELL_PIC_ITEM);
         dataList.add(pic);
+    }
+
+    private void isUpdate() {
+        if (getIntent().getStringExtra("goodsId") != null) {
+            OkGo.<String>get(ApiUrl.url + "/goods/" + getIntent().getStringExtra("goodsId"))
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            JSONObject jsonObject = JSON.parseObject(response.body());
+                            GoodsInfo goodsInfo = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<GoodsInfo>() {
+                            });
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).setText(goodsInfo.getGoodsName());
+                                    ((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).setText(goodsInfo.getGoodsDescription());
+                                    ((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).setText(String.valueOf(goodsInfo.getGoodsPrice()));
+                                    ((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).setText(goodsInfo.getGoodsPhone());
+                                    ((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).setText(goodsInfo.getGoodsAddress());
+                                }
+                            });
+                        }
+                    });
+        }
     }
 
     private void initListener() {
@@ -179,7 +209,7 @@ public class SellActivity extends AppCompatActivity {
                  */
                 ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
                 pd2.setTitle("上架商品");
-                pd2.setIcon(R.mipmap.ic_launcher_round);
+                pd2.setIcon(R.mipmap.app_icon);
                 pd2.setMessage("正在同步信息...");
                 pd2.setCancelable(false);
                 pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -233,5 +263,104 @@ public class SellActivity extends AppCompatActivity {
                 }).start();
             }
         });
+        /**
+         * 修改按钮事件监听处理
+         */
+        if (getIntent().getStringExtra("goodsId") != null) {
+            sellTitle.setText("修改商品");
+            sellOk.setText("修改");
+            sellOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    /**
+                     * 修改商品信息
+                     */
+                    Handler updateHandler = new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            Bundle bundle = msg.getData();
+                            switch (msg.what) {
+                                case 200:
+                                    OkGo.<String>put(ApiUrl.url + "/goods/" + getIntent().getStringExtra("goodsId"))
+                                            .headers("token", SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("token"))
+                                            .params("goodsImgs", bundle.getString("goodsImgs"))
+                                            .params("goodsName", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).getText()))
+                                            .params("goodsDescription", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).getText()))
+                                            .params("goodsPrice", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).getText()))
+                                            .params("goodsPhone", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).getText()))
+                                            .params("goodsAddress", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).getText()))
+                                            .execute(new StringCallback() {
+                                                @Override
+                                                public void onSuccess(Response<String> response) {
+                                                    Toast toast = Toast.makeText(SellActivity.this, null, Toast.LENGTH_SHORT);
+                                                    toast.setText("商品修改成功");
+                                                    toast.show();
+                                                    Intent intent = new Intent(SellActivity.this, HomeActivity.class);
+                                                    startActivity(intent);
+                                                }
+                                            });
+                            }
+                        }
+                    };
+                    /**
+                     * 展示上传进度条
+                     */
+                    ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
+                    pd2.setTitle("修改商品");
+                    pd2.setIcon(R.mipmap.ic_launcher_round);
+                    pd2.setMessage("正在同步信息...");
+                    pd2.setCancelable(false);
+                    pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    pd2.show();
+                    /**
+                     * 新开线程得到,分割的储存好的图片路径
+                     */
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            flag = 0;
+                            for (int i = 0; i < imgUris.size(); i++) {
+                                /**
+                                 * uri转file
+                                 */
+                                Uri uri = imgUris.get(i);
+                                String[] proj = {MediaStore.Images.Media.DATA};
+                                Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+                                int actual_image_column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                                cursor.moveToFirst();
+                                String img_path = cursor.getString(actual_image_column_index);
+                                File file = new File(img_path);
+                                /**
+                                 * 请求储存图片至smms图床
+                                 */
+                                OkGo.<String>post("https://sm.ms/api/v2/upload")
+                                        .isMultipart(true)
+                                        .headers("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
+                                        .params("smfile", file)
+                                        .execute(new StringCallback() {
+                                            @Override
+                                            public void onSuccess(Response<String> response) {
+                                                JSONObject jsonObject = JSONObject.parseObject(response.body());
+                                                String url = jsonObject.getJSONObject("data").getString("url");
+                                                goodsImgs.append(url + ",");
+                                                flag++;
+                                                if (flag == (imgUris.size())) {
+                                                    goodsImgs.deleteCharAt(goodsImgs.length() - 1);
+                                                    Message msg = new Message();
+                                                    msg.what = 200;
+                                                    Bundle bundle = new Bundle();
+                                                    bundle.putString("goodsImgs", String.valueOf(goodsImgs));
+                                                    msg.setData(bundle);
+                                                    updateHandler.sendMessage(msg);
+                                                }
+                                            }
+                                        });
+                                cursor.close();
+                            }
+                        }
+                    }).start();
+                }
+            });
+        }
     }
 }

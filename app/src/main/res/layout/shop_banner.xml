@@ -6,6 +6,16 @@
     android:layout_height="wrap_content"
     tools:context=".HomeActivity">
 
+    <TextView
+        android:id="@+id/shop_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/auqamarin"
+        app:layout_constraintDimensionRatio="10 : 3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.renoside.banner.Banner
         android:id="@+id/shop_banner"
         android:layout_width="0dp"

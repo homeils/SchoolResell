@@ -9,8 +9,8 @@
     <LinearLayout
         android:id="@+id/put_header"
         android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:background="@color/sandyBrown"
+        android:layout_height="35dp"
+        android:background="@color/auqamarin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -35,17 +35,17 @@
         android:text="搜索"
         android:textColor="@color/white"
         app:layout_constraintBaseline_toBaselineOf="@id/put_title"
-        app:layout_constraintRight_toLeftOf="@id/put_cancel" />
-
-    <TextView
-        android:id="@+id/put_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="一键取消"
-        android:textColor="@color/white"
-        app:layout_constraintBaseline_toBaselineOf="@id/put_title"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/put_cancel"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_margin="8dp"-->
+        <!--android:text="一键取消"-->
+        <!--android:textColor="@color/white"-->
+        <!--app:layout_constraintBaseline_toBaselineOf="@id/put_title"-->
+        <!--app:layout_constraintRight_toRightOf="parent" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/put_recyclerview"

@@ -23,7 +23,7 @@ import com.renoside.schoolresell.Adapter.PutRcvAdapter;
 import com.renoside.schoolresell.Bean.Order;
 import com.renoside.schoolresell.Entity.PutEntity;
 import com.renoside.schoolresell.Utils.ApiUrl;
-import com.renoside.schoolresell.Utils.PopupWindowUtil;
+import com.renoside.schoolresell.Utils.IndentPopWindowUtil;
 import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
@@ -38,8 +38,8 @@ public class PutActivity extends AppCompatActivity {
     LinearLayout putHeader;
     @BindView(R.id.put_search)
     TextView putSearch;
-    @BindView(R.id.put_cancel)
-    TextView putCancel;
+//    @BindView(R.id.put_cancel)
+//    TextView putCancel;
     @BindView(R.id.put_recyclerview)
     RecyclerView putRecyclerview;
 
@@ -109,11 +109,11 @@ public class PutActivity extends AppCompatActivity {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 if (dataList.get(position).getPutStatus().equals("在售中")) {
-                    PopupWindowUtil.showPopupWindow(PutActivity.this, PutActivity.this, view, 1001);
+                    IndentPopWindowUtil.showPopupWindow(PutActivity.this, PutActivity.this, view, 1001);
                     /**
                      * 下架商品
                      */
-                    PopupWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
+                    IndentPopWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             OkGo.<String>delete(ApiUrl.url + "/goods/" + dataList.get(position).getGoodsId())
@@ -124,6 +124,7 @@ public class PutActivity extends AppCompatActivity {
                                             Toast toast = Toast.makeText(PutActivity.this, null, Toast.LENGTH_SHORT);
                                             toast.setText("商品下架成功！");
                                             toast.show();
+                                            IndentPopWindowUtil.popWindow.dismiss();
                                             setDataList();
                                         }
                                     });
@@ -132,19 +133,20 @@ public class PutActivity extends AppCompatActivity {
                     /**
                      * 修改商品信息
                      */
-                    PopupWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
+                    IndentPopWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Intent intent = new Intent(PutActivity.this, SellActivity.class);
+                            intent.putExtra("goodsId", dataList.get(position).getGoodsId());
                             startActivity(intent);
                         }
                     });
                 } else if (dataList.get(position).getPutStatus().equals("交易中")) {
-                    PopupWindowUtil.showPopupWindow(PutActivity.this, PutActivity.this, view, 10022);
+                    IndentPopWindowUtil.showPopupWindow(PutActivity.this, PutActivity.this, view, 10022);
                     /**
                      * 下架商品
                      */
-                    PopupWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
+                    IndentPopWindowUtil.popOkOrder.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             OkGo.<String>delete(ApiUrl.url + "/goods/" + dataList.get(position).getGoodsId())
@@ -155,6 +157,7 @@ public class PutActivity extends AppCompatActivity {
                                             Toast toast = Toast.makeText(PutActivity.this, null, Toast.LENGTH_SHORT);
                                             toast.setText("商品下架成功！");
                                             toast.show();
+                                            IndentPopWindowUtil.popWindow.dismiss();
                                             setDataList();
                                         }
                                     });
@@ -163,12 +166,13 @@ public class PutActivity extends AppCompatActivity {
                     /**
                      * 取消订单
                      */
-                    PopupWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
+                    IndentPopWindowUtil.popChannelOrder.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Toast toast = Toast.makeText(PutActivity.this, null, Toast.LENGTH_SHORT);
                             toast.setText("您可以联系买家取消订单，或者直接下架商品哦！");
                             toast.show();
+                            IndentPopWindowUtil.popWindow.dismiss();
                             setDataList();
                         }
                     });

@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
-        android:textColor="@color/sandyBrown"
+        android:textColor="@color/auqamarin"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="￥"
-        android:textColor="@color/sandyBrown"
+        android:textColor="@color/auqamarin"
         app:layout_constraintBaseline_toBaselineOf="@id/goods_item_price"
         app:layout_constraintRight_toLeftOf="@id/goods_item_price" />
 

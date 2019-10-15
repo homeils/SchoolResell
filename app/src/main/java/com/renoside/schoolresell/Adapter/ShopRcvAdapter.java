@@ -1,6 +1,7 @@
 package com.renoside.schoolresell.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -79,6 +80,7 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
                 break;
             case ShopEntity.SHOP_RECOMMEND_HINT:
                 TextView shopRecommendHintLeft = helper.getView(R.id.shop_hint_left);
+                shopRecommendHintLeft.setTextColor(mContext.getResources().getColor(R.color.black));
                 shopRecommendHintLeft.setText("为您精选");
                 TextView shopRecommendHintRight = helper.getView(R.id.shop_hint_right);
                 shopRecommendHintRight.setText("换一批");
@@ -92,6 +94,7 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
                 break;
             case ShopEntity.SHOP_GOODS_HINT:
                 TextView shopGoodsHintLeft = helper.getView(R.id.shop_hint_left);
+                shopGoodsHintLeft.setTextColor(mContext.getResources().getColor(R.color.black));
                 shopGoodsHintLeft.setText("全部商品");
                 break;
             case ShopEntity.SHOP_GOODS:

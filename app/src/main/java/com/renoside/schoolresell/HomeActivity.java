@@ -1,7 +1,9 @@
 package com.renoside.schoolresell;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +20,7 @@ import com.renoside.schoolresell.Fragment.FragmentOrder;
 import com.renoside.schoolresell.Fragment.FragmentMsg;
 import com.renoside.schoolresell.Fragment.FragmentPIM;
 import com.renoside.schoolresell.Fragment.FragmentShop;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
     @BindView(R.id.home_tab_points)
     LinearLayout homeTabPoints;
 
+    private VpgFragmentAdapter vpgFragmentAdapter;
     /**
      * 定义Tab标题集合
      */
@@ -44,11 +48,14 @@ public class HomeActivity extends AppCompatActivity {
      * 定义Fragment集合
      */
     private List<FragmentCreator> fragmentCreatorList;
-
     /**
      * 是否滑动完毕
      */
     private boolean isDragging = false;
+    /**
+     * 图标地址数组
+     */
+    private Integer[] tabIcos = {R.drawable.tab_selector_shop, R.drawable.tab_selector_msg, R.drawable.tab_selector_order, R.drawable.tab_selector_pim};
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,14 +66,27 @@ public class HomeActivity extends AppCompatActivity {
          * 创建并向集合添加数据，绑定适配器等
          */
         start();
-        /**
-         * 2秒之后隐藏Tab
-         */
-        hideTab();
+//        /**
+//         * 2秒之后隐藏Tab
+//         */
+//        hideTab();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        List<Fragment> frags = getSupportFragmentManager().getFragments();
+        if (frags != null) {
+            for (Fragment f : frags) {
+                if (f != null)
+                    f.onActivityResult(requestCode, resultCode, data);
+            }
+        }
     }
 
     /**
      * 返回直接隐藏程序
+     *
      * @param keyCode
      * @param event
      * @return
@@ -88,7 +108,7 @@ public class HomeActivity extends AppCompatActivity {
         fragmentCreatorList.add(createFragmentCreator(new FragmentShop()));
         fragmentCreatorList.add(createFragmentCreator(new FragmentMsg()));
         fragmentCreatorList.add(createFragmentCreator(new FragmentOrder()));
-        fragmentCreatorList.add(createFragmentCreator(new FragmentPIM()));
+        fragmentCreatorList.add(createFragmentCreator(new FragmentPIM(new RxPermissions(this))));
         /**
          * 添加Tab集合数据
          */
@@ -100,7 +120,7 @@ public class HomeActivity extends AppCompatActivity {
         /**
          * 实例化适配器
          */
-        VpgFragmentAdapter vpgFragmentAdapter = new VpgFragmentAdapter(getSupportFragmentManager(), this);
+        vpgFragmentAdapter = new VpgFragmentAdapter(getSupportFragmentManager(), this);
         /**
          * 绑定适配器
          */
@@ -127,23 +147,23 @@ public class HomeActivity extends AppCompatActivity {
         return fragmentCreator;
     }
 
-    /**
-     * 2秒之后隐藏Tab方法体
-     */
-    private void hideTab() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(2000);
-                runOnUiThread(() -> {
-                    homeTabContainer.setVisibility(View.GONE);
-                    homeTabTitle.setVisibility(View.GONE);
-                    homeTabPoints.setVisibility(View.GONE);
-                });
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
+//    /**
+//     * 2秒之后隐藏Tab方法体
+//     */
+//    private void hideTab() {
+//        new Thread(() -> {
+//            try {
+//                Thread.sleep(2000);
+//                runOnUiThread(() -> {
+//                    homeTabContainer.setVisibility(View.GONE);
+//                    homeTabTitle.setVisibility(View.GONE);
+//                    homeTabPoints.setVisibility(View.GONE);
+//                });
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }).start();
+//    }
 
     /**
      * ViewPager适配器内部类
@@ -162,13 +182,21 @@ public class HomeActivity extends AppCompatActivity {
              */
             for (int i = 0; i < fragmentCreatorList.size(); i++) {
                 ImageView point = new ImageView(context);
-                point.setBackgroundResource(R.drawable.tab_point_selector);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(25, 25);
+                point.setClickable(true);
+                point.setBackgroundResource(tabIcos[i]);
+                final int sign = i;
+                point.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        homeFragmentContainer.setCurrentItem(sign);
+                    }
+                });
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(75, 75);
                 if (i == 0) {
-                    point.setEnabled(true);
+                    point.setSelected(true);
                 } else {
-                    point.setEnabled(false);
-                    params.leftMargin = 8;
+                    point.setSelected(false);
+                    params.leftMargin = 40;
                 }
                 point.setLayoutParams(params);
                 homeTabPoints.addView(point);
@@ -238,8 +266,8 @@ public class HomeActivity extends AppCompatActivity {
              * 设置Tab导航点
              */
             if (fragmentCreatorList != null && fragmentCreatorList.size() != 0) {
-                homeTabPoints.getChildAt(prePosition).setEnabled(false);
-                homeTabPoints.getChildAt(position).setEnabled(true);
+                homeTabPoints.getChildAt(prePosition).setSelected(false);
+                homeTabPoints.getChildAt(position).setSelected(true);
                 prePosition = position;
             }
         }
@@ -278,10 +306,10 @@ public class HomeActivity extends AppCompatActivity {
                 });
                 isDragging = true;
             } else if (state == ViewPager.SCROLL_STATE_IDLE && isDragging) {
-                /**
-                 * 静止2秒之后隐藏Tab
-                 */
-                hideTab();
+//                /**
+//                 * 静止2秒之后隐藏Tab
+//                 */
+//                hideTab();
             }
         }
 
@@ -295,5 +323,4 @@ public class HomeActivity extends AppCompatActivity {
         Fragment createFragment();
 
     }
-
 }

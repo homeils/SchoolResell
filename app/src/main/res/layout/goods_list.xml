@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="￥"
-                android:textColor="@color/sandyBrown"
+                android:textColor="@color/auqamarin"
                 app:layout_constraintBottom_toBottomOf="@id/goods_list_container"
                 app:layout_constraintLeft_toLeftOf="@id/goods_list_container"
                 app:layout_constraintTop_toBottomOf="@id/goods_list_description" />
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
-                android:textColor="@color/sandyBrown"
+                android:textColor="@color/auqamarin"
                 android:textSize="18sp"
                 app:layout_constraintBaseline_toBaselineOf="@id/goods_list_hint1"
                 app:layout_constraintLeft_toRightOf="@id/goods_list_hint1" />

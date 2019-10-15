@@ -33,6 +33,7 @@ import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -200,7 +201,7 @@ public class GoodsActivity extends AppCompatActivity {
              */
             ProgressDialog pd2 = new ProgressDialog(GoodsActivity.this);
             pd2.setTitle("正在购买");
-            pd2.setIcon(R.mipmap.ic_launcher_round);
+            pd2.setIcon(R.mipmap.app_icon);
             pd2.setMessage("正在为您下单...");
             pd2.setCancelable(false);
             pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -217,12 +218,29 @@ public class GoodsActivity extends AppCompatActivity {
                             .execute(new StringCallback() {
                                 @Override
                                 public void onSuccess(Response<String> response) {
-                                    pd2.cancel();
-                                    Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
-                                    toast.setText("下单成功");
-                                    toast.show();
-                                    Intent intent = new Intent(GoodsActivity.this, HomeActivity.class);
-                                    startActivity(intent);
+                                    if (response.code() == 200) {
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        pd2.cancel();
+                                        Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
+                                        toast.setText("下单成功");
+                                        toast.show();
+                                        Intent intent = new Intent(GoodsActivity.this, HomeActivity.class);
+                                        startActivity(intent);
+                                    } else if (response.code() == 403) {
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+                                        pd2.dismiss();
+                                        Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
+                                        toast.setText("不能购买自己的商品哦");
+                                        toast.show();
+                                    }
                                 }
                             });
                 }
