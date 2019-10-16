@@ -1,7 +1,6 @@
 package com.renoside.schoolresell.Adapter;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -11,10 +10,11 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.chad.library.adapter.base.util.MultiTypeDelegate;
-import com.renoside.banner.Banner;
-import com.renoside.banner.ImageLoader;
 import com.renoside.schoolresell.Entity.ShopEntity;
 import com.renoside.schoolresell.R;
+import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.loader.ImageLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,28 +48,21 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
     protected void convert(@NonNull BaseViewHolder helper, ShopEntity item) {
         switch (helper.getItemViewType()) {
             case ShopEntity.SHOP_BANNER:
-                Banner banner = helper.getView(R.id.shop_banner);
                 List<Integer> images = new ArrayList<>();
-                List<String> titles = new ArrayList<>();
-                images.add(R.drawable.banner_1);
-                images.add(R.drawable.banner_2);
-                images.add(R.drawable.banner_3);
-                images.add(R.drawable.banner_4);
-                images.add(R.drawable.banner_5);
-                for (int i = 0; i < 5; i++) {
-                    titles.add("这是第" + (i + 1) + "个页面");
-                }
+                images.add(R.mipmap.banner_1);
+                images.add(R.mipmap.banner_2);
+                images.add(R.mipmap.banner_3);
+                images.add(R.mipmap.banner_4);
+                images.add(R.mipmap.banner_5);
+                Banner banner =  helper.getView(R.id.shop_banner);
                 banner.setImageLoader(new ImageLoader() {
                     @Override
-                    public void conImageLoader(Context context, Object path, ImageView imageView) {
+                    public void displayImage(Context context, Object path, ImageView imageView) {
                         Glide.with(context).load(path).into(imageView);
                     }
                 });
-                banner.setPointSize(20);
-                banner.setRelay(2000);
-                banner.setTitleColor(0xFFFFFFFF);
+                banner.setIndicatorGravity(BannerConfig.LEFT);
                 banner.setImages(images);
-                banner.setTitles(titles);
                 banner.start();
                 break;
             case ShopEntity.SHOP_CHANNEL:

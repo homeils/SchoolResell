@@ -203,7 +203,7 @@ public class FragmentShop extends Fragment {
      */
     private void iniListener() {
         /**
-         * 出售商品按钮
+         * 上架商品按钮
          */
         shopSearch.setOnRightIcoListener(new OnRightIcoListener() {
             @Override

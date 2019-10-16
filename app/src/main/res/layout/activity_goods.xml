@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".GoodsActivity">
 
     <LinearLayout
         android:id="@+id/goods_header"
         android:layout_width="0dp"
-        android:layout_height="45dp"
+        android:layout_height="38dp"
         android:background="@color/auqamarin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -51,7 +52,7 @@
     <LinearLayout
         android:id="@+id/goods_footer"
         android:layout_width="0dp"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:background="@color/auqamarin"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -10,8 +10,6 @@ import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.chad.library.adapter.base.util.MultiTypeDelegate;
-import com.renoside.banner.Banner;
-import com.renoside.banner.ImageLoader;
 import com.renoside.schoolresell.Entity.GoodsEntity;
 import com.renoside.schoolresell.R;
 
@@ -29,41 +27,24 @@ public class GoodsRcvAdapter extends BaseQuickAdapter<GoodsEntity, BaseViewHolde
             }
         });
         getMultiTypeDelegate()
-                .registerItemType(GoodsEntity.GOODS_BANNER, R.layout.goods_banner)
                 .registerItemType(GoodsEntity.GOODS_NAME_PRICE, R.layout.goods_name_price)
                 .registerItemType(GoodsEntity.GOODS_DESCRIPTION, R.layout.goods_description)
+                .registerItemType(GoodsEntity.GOODS_IMG, R.layout.goods_img)
                 .registerItemType(GoodsEntity.GOODS_LIST, R.layout.goods_list);
     }
 
     @Override
     protected void convert(@NonNull BaseViewHolder helper, GoodsEntity item) {
         switch (helper.getItemViewType()) {
-            case GoodsEntity.GOODS_BANNER:
-                Banner banner = helper.getView(R.id.goods_banner);
-                banner.setImageLoader(new ImageLoader() {
-                    @Override
-                    public void conImageLoader(Context context, Object path, ImageView imageView) {
-                        Glide.with(context).load(path).into(imageView);
-                    }
-                });
-                banner.setPointSize(20);
-                banner.setRelay(2000);
-                banner.setImages(item.getGoodsImgs());
-                banner.start();
-//                Banner banner = helper.getView(R.id.goods_banner);
-//                banner.setImages(item.getGoodsImgs()).setImageLoader(new ImageLoader() {
-//                    @Override
-//                    public void displayImage(Context context, Object path, ImageView imageView) {
-//                        Glide.with(mContext).load(path).into(imageView);
-//                    }
-//                }).start();
-                break;
             case GoodsEntity.GOODS_NAME_PRICE:
                 helper.setText(R.id.goods_item_name, item.getGoodsName());
                 helper.setText(R.id.goods_item_price, item.getGoodsPrice());
                 break;
             case GoodsEntity.GOODS_DESCRIPTION:
                 helper.setText(R.id.goods_item_description, item.getGoodsDescription());
+                break;
+            case GoodsEntity.GOODS_IMG:
+                Glide.with(mContext).load(item.getGoodsImg()).into((ImageView) helper.getView(R.id.goods_img));
                 break;
             case GoodsEntity.GOODS_LIST:
                 Glide.with(mContext).load(item.getGoodsImg()).into((ImageView) helper.getView(R.id.goods_list_img));
@@ -74,7 +55,6 @@ public class GoodsRcvAdapter extends BaseQuickAdapter<GoodsEntity, BaseViewHolde
                 break;
             default:
                 break;
-
         }
     }
 

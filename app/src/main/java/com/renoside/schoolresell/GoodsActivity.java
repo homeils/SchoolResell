@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -52,6 +53,7 @@ public class GoodsActivity extends AppCompatActivity {
     @BindView(R.id.goods_buy)
     TextView goodsBuy;
 
+    private int imgNum = 0;
     private static String goodsId;
     private GoodsRcvAdapter rcvAdapter;
     private List<GoodsEntity> dataList = new ArrayList<>();
@@ -89,6 +91,7 @@ public class GoodsActivity extends AppCompatActivity {
             }
         });
         goodsRecyclerview.setLayoutManager(manager);
+        initListener();
     }
 
     /**
@@ -96,6 +99,7 @@ public class GoodsActivity extends AppCompatActivity {
      */
     private void setDataList() {
         dataList.clear();
+        imgNum = 0;
         /**
          * 请求添加商品列表数据
          */
@@ -140,15 +144,6 @@ public class GoodsActivity extends AppCompatActivity {
                         JSONObject jsonObject = JSON.parseObject(response.body());
                         GoodsInfo goodsInfo = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<GoodsInfo>() {
                         });
-                        GoodsEntity banner = new GoodsEntity(GoodsEntity.GOODS_BANNER);
-                        if (goodsInfo != null) {
-                            List<Object> bannerImgs = new ArrayList<>();
-                            for (int i = 0; i < goodsInfo.getGoodsImgs().size(); i++) {
-                                bannerImgs.add(goodsInfo.getGoodsImgs().get(i).getGoodsImg());
-                            }
-                            banner.setGoodsImgs(bannerImgs);
-                        }
-                        dataList.add(banner);
                         GoodsEntity namePrice = new GoodsEntity(GoodsEntity.GOODS_NAME_PRICE);
                         if (goodsInfo.getGoodsName() != null && !goodsInfo.getGoodsName().equals("")) {
                             namePrice.setGoodsName(goodsInfo.getGoodsName());
@@ -162,6 +157,15 @@ public class GoodsActivity extends AppCompatActivity {
                             description.setGoodsDescription(goodsInfo.getGoodsDescription());
                         }
                         dataList.add(description);
+                        /**
+                         * 添加图片
+                         */
+                        for (int i = 0; i < goodsInfo.getGoodsImgs().size(); i++) {
+                            imgNum++;
+                            GoodsEntity img = new GoodsEntity(GoodsEntity.GOODS_IMG);
+                            img.setGoodsImg(goodsInfo.getGoodsImgs().get(i).getGoodsImg());
+                            dataList.add(img);
+                        }
                         Message msg = new Message();
                         msg.what = 200;
                         loadGoodsList.sendMessage(msg);
@@ -246,5 +250,26 @@ public class GoodsActivity extends AppCompatActivity {
                 }
             }).start();
         }
+    }
+
+    /**
+     * 商品列表监听
+     */
+    private void initListener() {
+        rcvAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                if (position >= (2 + imgNum)) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString("goodsId", dataList.get(position).getGoodsId());
+                    Message msg = new Message();
+                    msg.what = 200;
+                    msg.setData(bundle);
+                    GoodsActivity.handler.sendMessage(msg);
+                    Intent intent = new Intent(GoodsActivity.this, GoodsActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
     }
 }

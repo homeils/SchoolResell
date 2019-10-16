@@ -8,6 +8,7 @@ public class GoodsEntity {
     public static final int GOODS_NAME_PRICE = 5002;
     public static final int GOODS_DESCRIPTION = 5003;
     public static final int GOODS_LIST = 5004;
+    public static final int GOODS_IMG = 5005;
 
     public int itemType;
     private String goodsId;
@@ -32,6 +33,8 @@ public class GoodsEntity {
                 return 2;
             case GOODS_LIST:
                 return 1;
+            case GOODS_IMG:
+                return 2;
             default:
                 return -1;
         }
