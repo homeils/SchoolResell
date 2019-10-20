@@ -12,6 +12,7 @@ public class GoodsEntity {
 
     public int itemType;
     private String goodsId;
+    private String sellerId;
     private List<Object> goodsImgs;
     private Object goodsImg;
     private String goodsName;
@@ -46,6 +47,14 @@ public class GoodsEntity {
 
     public void setGoodsId(String goodsId) {
         this.goodsId = goodsId;
+    }
+
+    public String getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(String sellerId) {
+        this.sellerId = sellerId;
     }
 
     public List<Object> getGoodsImgs() {

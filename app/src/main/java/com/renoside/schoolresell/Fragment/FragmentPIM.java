@@ -31,6 +31,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.hyphenate.chat.EMClient;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -41,6 +42,7 @@ import com.renoside.schoolresell.LoginActivity;
 import com.renoside.schoolresell.PutActivity;
 import com.renoside.schoolresell.R;
 import com.renoside.schoolresell.Utils.ApiUrl;
+import com.renoside.schoolresell.Utils.EasemobUtils;
 import com.renoside.schoolresell.Utils.PIMPopWindowUtils;
 import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 import com.tbruyelle.rxpermissions2.RxPermissions;
@@ -98,6 +100,7 @@ public class FragmentPIM extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_pim, container, false);
         bind = ButterKnife.bind(this, view);
+        EasemobUtils.initEasemob(getContext());
         /**
          * 设置数据集合
          */
@@ -448,6 +451,7 @@ public class FragmentPIM extends Fragment {
                      * 退出登录
                      */
                     case 11:
+                        EMClient.getInstance().logout(true);
                         Intent start = new Intent(getActivity(), LoginActivity.class);
                         SharedPreferencesUtils.saveIsFirstLogin(getContext(), true);
                         startActivity(start);

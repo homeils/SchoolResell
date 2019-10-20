@@ -30,6 +30,7 @@ import com.renoside.schoolresell.Bean.Goods;
 import com.renoside.schoolresell.Bean.GoodsInfo;
 import com.renoside.schoolresell.Entity.GoodsEntity;
 import com.renoside.schoolresell.Utils.ApiUrl;
+import com.renoside.schoolresell.Utils.EasemobUtils;
 import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import java.util.ArrayList;
@@ -146,6 +147,7 @@ public class GoodsActivity extends AppCompatActivity {
                         });
                         GoodsEntity namePrice = new GoodsEntity(GoodsEntity.GOODS_NAME_PRICE);
                         if (goodsInfo.getGoodsName() != null && !goodsInfo.getGoodsName().equals("")) {
+                            namePrice.setSellerId(goodsInfo.getSellerId());
                             namePrice.setGoodsName(goodsInfo.getGoodsName());
                         }
                         if (goodsInfo.getGoodsPrice() != null) {
@@ -179,7 +181,7 @@ public class GoodsActivity extends AppCompatActivity {
      *
      * @param view
      */
-    @OnClick({R.id.goods_like, R.id.goods_buy})
+    @OnClick({R.id.goods_phone, R.id.goods_like, R.id.goods_buy})
     public void goodsOnClick(View view) {
         if (view.getId() == R.id.goods_like) {
             /**
@@ -249,6 +251,24 @@ public class GoodsActivity extends AppCompatActivity {
                             });
                 }
             }).start();
+        } else if (view.getId() == R.id.goods_phone) {
+            /**
+             * 发起聊天
+             */
+            OkGo.<String>get(ApiUrl.url + "/user/" + dataList.get(0).getSellerId() + "/username")
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            if (response.code() == 200) {
+                                JSONObject jsonObject = JSONObject.parseObject(response.body());
+                                String temp = jsonObject.getString("userName").replace("@", "");
+                                String toChatUsername = temp.replace(".", "");
+                                Intent intent = new Intent(GoodsActivity.this, TalkActivity.class);
+                                intent.putExtra("to_chat_username", toChatUsername);
+                                startActivity(intent);
+                            }
+                        }
+                    });
         }
     }
 

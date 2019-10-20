@@ -1,6 +1,7 @@
 package com.renoside.schoolresell;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,8 +14,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hyphenate.EMMessageListener;
+import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMConversation;
+import com.hyphenate.chat.EMMessage;
 import com.renoside.schoolresell.Adapter.TalkRcvAdapter;
 import com.renoside.schoolresell.Entity.TalkEntity;
+import com.renoside.schoolresell.Utils.EasemobUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,13 +47,14 @@ public class TalkActivity extends AppCompatActivity {
     /**
      * 定义数据集合
      */
-    private List<TalkEntity> dataList;
+    private List<TalkEntity> dataList = new ArrayList<>();
     private TalkRcvAdapter rcvAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_talk);
+        EasemobUtils.initEasemob(TalkActivity.this);
         ButterKnife.bind(this);
         /**
          * 设置数据集合
@@ -87,21 +94,50 @@ public class TalkActivity extends AppCompatActivity {
     }
 
     private void setDataList() {
-        dataList = new ArrayList<>();
-        TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
-        receive.setTalkMsg("Hello, nice to meet you!");
-        dataList.add(receive);
-        TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
-        send.setTalkMsg("Hello!");
-        dataList.add(send);
+        dataList.clear();
+        EMConversation conversation = EMClient.getInstance().chatManager().getConversation(getIntent().getStringExtra("to_chat_username"));
+        //获取此会话的所有消息
+        List<EMMessage> message = conversation.getAllMessages();
+        //SDK初始化加载的聊天记录为20条，到顶时需要去DB里获取更多
+        //获取startMsgId之前的pagesize条消息，此方法获取的messages SDK会自动存入到此会话中，APP中无需再次把获取到的messages添加到会话中
+        List<EMMessage> messages = conversation.loadMoreMsgFromDB(message.get(0).getMsgId(), 20);
+        for (int i = 0; i < messages.size(); i++) {
+            if (messages.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
+                TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
+                send.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
+                dataList.add(send);
+            } else {
+                TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+                receive.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
+                dataList.add(receive);
+            }
+            Log.d("getThisUserAllMessage", "messages: " + messages.get(i).toString());
+        }
+        for (int i = 0; i < message.size(); i++) {
+            if (message.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
+                TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
+                send.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
+                dataList.add(send);
+            } else {
+                TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+                receive.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
+                dataList.add(receive);
+            }
+            Log.d("getThisUserAllMessage", "message: " + message.get(i).toString());
+        }
     }
 
     @OnClick(R.id.talk_ok)
     public void talkOnClick(View view) {
         if (view.getId() == R.id.talk_ok) {
-            Toast.makeText(this, "Send successfully " + talkInput.getText(), Toast.LENGTH_SHORT).show();
             String msg = talkInput.getText().toString();
             if (!msg.equals("")) {
+                String toChatUsername = getIntent().getStringExtra("to_chat_username");
+                Log.d("send_message", "onSuccess: " + toChatUsername);
+                //创建一条文本消息，content为消息文字内容，toChatUsername为对方用户或者群聊的id，后文皆是如此
+                EMMessage message = EMMessage.createTxtSendMessage(msg, toChatUsername);
+                //发送消息
+                EMClient.getInstance().chatManager().sendMessage(message);
                 TalkEntity talkEntity = new TalkEntity(TalkEntity.TALK_SEND);
                 talkEntity.setTalkMsg(msg);
                 dataList.add(talkEntity);
