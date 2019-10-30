@@ -20,7 +20,6 @@
         android:id="@+id/order_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:text="我的订单"
         android:padding="8dp"
         android:textColor="@color/white"
@@ -28,18 +27,6 @@
         app:layout_constraintLeft_toLeftOf="@id/order_header"
         app:layout_constraintTop_toTopOf="@id/order_header"
         app:layout_constraintBottom_toBottomOf="@id/order_header"/>
-
-    <TextView
-        android:id="@+id/order_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:padding="8dp"
-        android:text="搜索"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/order_title"
-        app:layout_constraintRight_toRightOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_recyclerview"
@@ -72,16 +59,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@id/order_footer"
         app:layout_constraintRight_toRightOf="parent" />
-
-    <!--<TextView-->
-        <!--android:id="@+id/order_complete"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_margin="8dp"-->
-        <!--android:text="一键完成"-->
-        <!--android:textColor="@color/white"-->
-        <!--app:layout_constraintBottom_toBottomOf="parent"-->
-        <!--app:layout_constraintRight_toRightOf="parent"-->
-        <!--app:layout_constraintTop_toTopOf="@id/order_footer" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

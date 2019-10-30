@@ -1,18 +1,21 @@
 package com.renoside.schoolresell;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hyphenate.EMCallBack;
 import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMOptions;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
@@ -23,8 +26,6 @@ import com.renoside.schoolresell.Utils.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -44,6 +45,22 @@ public class LoginActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         EasemobUtils.initEasemob(LoginActivity.this);
         initListener();
+    }
+
+    /**
+     * 返回直接退出程序
+     *
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return false;
     }
 
     private void initListener() {
@@ -79,58 +96,83 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onSuccess(Response<String> response) {
                                     if (response.code() == 200) {
+                                        /**
+                                         * 解析数据
+                                         */
                                         JSONObject jsonObject = JSONObject.parseObject(response.body());
                                         String userId = jsonObject.getString("userId");
                                         String token = jsonObject.getString("token");
                                         String easemobToken = jsonObject.getString("easemob_token");
                                         /**
+                                         * 展示上传进度条
+                                         */
+                                        ProgressDialog pd2 = new ProgressDialog(LoginActivity.this);
+                                        pd2.setTitle("注册/登录");
+                                        pd2.setIcon(R.mipmap.app_icon);
+                                        pd2.setMessage("正在进行注册/登录，请稍后...");
+                                        pd2.setCancelable(false);
+                                        pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                        pd2.show();
+                                        /**
                                          * 请求注册或登录环信IM用户
                                          */
                                         if (easemobToken != null && !easemobToken.equals("")) {
                                             JSONObject easemobJson = new JSONObject();
-                                            String temp = loginUsername.getText().replace("@", "");
-                                            String username = temp.replace(".", "");
+                                            String username = loginUsername.getText().replace("@", "_");
                                             easemobJson.put("username", username);
                                             easemobJson.put("password", loginPassword.getText());
                                             if (jsonObject.getString("message").equals("新用户注册")) {
-                                                /**
-                                                 * 环信新用户注册
-                                                 */
-                                                OkGo.<String>post(ApiUrl.easemob + "/users")
-                                                        .headers("Content-Type", "application/json")
-                                                        .headers("Authorization", "Bearer " + easemobToken)
-                                                        .upJson(String.valueOf(easemobJson))
-                                                        .execute(new StringCallback() {
+                                                AlertDialog.Builder security = new AlertDialog.Builder(LoginActivity.this)
+                                                        .setIcon(R.mipmap.app_icon)
+                                                        .setTitle("注册")
+                                                        .setMessage("系统检测到您第一次使用这个账号，将为您自动注册，请牢记你的账号和密码，点击继续")
+                                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                                                             @Override
-                                                            public void onSuccess(Response<String> response) {
-                                                                if (response.code() == 200) {
-                                                                    EMClient.getInstance().login(username, loginPassword.getText(), new EMCallBack() {//回调
-                                                                        @Override
-                                                                        public void onSuccess() {
-                                                                            Log.d("easemob: ", "登录聊天服务器成功！");
-                                                                            EMClient.getInstance().groupManager().loadAllGroups();
-                                                                            EMClient.getInstance().chatManager().loadAllConversations();
-                                                                            SharedPreferencesUtils.saveUserLoginInfo(LoginActivity.this, userId, token);
-                                                                            SharedPreferencesUtils.saveEasemobToken(LoginActivity.this, easemobToken);
-                                                                            SharedPreferencesUtils.saveEasemobUser(LoginActivity.this, username, loginPassword.getText());
-                                                                            SharedPreferencesUtils.saveIsFirstLogin(LoginActivity.this, false);
-                                                                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                                                                            startActivity(intent);
-                                                                        }
+                                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                                /**
+                                                                 * 环信新用户注册
+                                                                 */
+                                                                OkGo.<String>post(ApiUrl.easemob + "/users")
+                                                                        .headers("Content-Type", "application/json")
+                                                                        .headers("Authorization", "Bearer " + easemobToken)
+                                                                        .upJson(String.valueOf(easemobJson))
+                                                                        .execute(new StringCallback() {
+                                                                            @Override
+                                                                            public void onSuccess(Response<String> response) {
+                                                                                if (response.code() == 200) {
+                                                                                    EMClient.getInstance().login(username, loginPassword.getText(), new EMCallBack() {//回调
+                                                                                        @Override
+                                                                                        public void onSuccess() {
+                                                                                            pd2.dismiss();
+                                                                                            Log.d("easemob: ", "登录聊天服务器成功！");
+                                                                                            EMClient.getInstance().groupManager().loadAllGroups();
+                                                                                            EMClient.getInstance().chatManager().loadAllConversations();
+                                                                                            SharedPreferencesUtils.saveUserLoginInfo(LoginActivity.this, userId, token);
+                                                                                            SharedPreferencesUtils.saveEasemobToken(LoginActivity.this, easemobToken);
+                                                                                            SharedPreferencesUtils.saveEasemobUser(LoginActivity.this, username, loginPassword.getText());
+                                                                                            SharedPreferencesUtils.saveIsFirstLogin(LoginActivity.this, false);
+                                                                                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                                                                                            startActivity(intent);
+                                                                                        }
 
-                                                                        @Override
-                                                                        public void onProgress(int progress, String status) {
+                                                                                        @Override
+                                                                                        public void onProgress(int progress, String status) {
 
-                                                                        }
+                                                                                        }
 
-                                                                        @Override
-                                                                        public void onError(int code, String message) {
-                                                                            Log.d("easemob: ", "登录聊天服务器失败！");
-                                                                        }
-                                                                    });
-                                                                }
+                                                                                        @Override
+                                                                                        public void onError(int code, String message) {
+                                                                                            pd2.dismiss();
+                                                                                            Toast.makeText(LoginActivity.this, "注册/登录出错", Toast.LENGTH_SHORT).show();
+                                                                                            Log.d("easemob: ", "登录聊天服务器失败！");
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        });
                                                             }
                                                         });
+                                                security.create().show();
                                             } else if (jsonObject.getString("message").equals("老用户登录")) {
                                                 /**
                                                  * 环信老用户登陆
@@ -138,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 EMClient.getInstance().login(username, loginPassword.getText(), new EMCallBack() {//回调
                                                     @Override
                                                     public void onSuccess() {
+                                                        pd2.dismiss();
                                                         Log.d("easemob: ", "登录聊天服务器成功！");
                                                         EMClient.getInstance().groupManager().loadAllGroups();
                                                         EMClient.getInstance().chatManager().loadAllConversations();
@@ -156,7 +199,8 @@ public class LoginActivity extends AppCompatActivity {
 
                                                     @Override
                                                     public void onError(int code, String message) {
-                                                        Log.d("easemob: ", "登录聊天服务器失败！");
+                                                        pd2.dismiss();
+                                                        Toast.makeText(LoginActivity.this, "注册/登录出错", Toast.LENGTH_SHORT).show();
                                                     }
                                                 });
                                             }

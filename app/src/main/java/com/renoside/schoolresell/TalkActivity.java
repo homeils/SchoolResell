@@ -1,6 +1,8 @@
 package com.renoside.schoolresell;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -8,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -20,6 +23,7 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.renoside.schoolresell.Adapter.TalkRcvAdapter;
 import com.renoside.schoolresell.Entity.TalkEntity;
+import com.renoside.schoolresell.Fragment.FragmentMsg;
 import com.renoside.schoolresell.Utils.EasemobUtils;
 
 import java.util.ArrayList;
@@ -49,13 +53,73 @@ public class TalkActivity extends AppCompatActivity {
      */
     private List<TalkEntity> dataList = new ArrayList<>();
     private TalkRcvAdapter rcvAdapter;
+    /**
+     * 接收到信息的handler，用来刷新界面显示最后一条信息
+     */
+    Handler notify = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what) {
+                case 200:
+                    rcvAdapter.notifyItemInserted(dataList.size() - 1);
+                    talkRecyclerview.scrollToPosition(dataList.size() - 1);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+    /**
+     * 环信的信息监听
+     */
+    EMMessageListener msgListener = new EMMessageListener() {
+
+        @Override
+        public void onMessageReceived(List<EMMessage> messages) {
+            //收到消息
+            for (int i = 0; i < messages.size(); i++) {
+                TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+                receive.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
+                dataList.add(receive);
+                Message msg = new Message();
+                msg.what = 200;
+                notify.sendMessage(msg);
+            }
+        }
+
+        @Override
+        public void onCmdMessageReceived(List<EMMessage> messages) {
+            //收到透传消息
+        }
+
+        @Override
+        public void onMessageRead(List<EMMessage> messages) {
+            //收到已读回执
+        }
+
+        @Override
+        public void onMessageDelivered(List<EMMessage> message) {
+            //收到已送达回执
+        }
+
+        @Override
+        public void onMessageRecalled(List<EMMessage> messages) {
+            //消息被撤回
+        }
+
+        @Override
+        public void onMessageChanged(EMMessage message, Object change) {
+            //消息状态变动
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_talk);
-        EasemobUtils.initEasemob(TalkActivity.this);
         ButterKnife.bind(this);
+        EasemobUtils.initEasemob(TalkActivity.this);
+        EMClient.getInstance().chatManager().addMessageListener(msgListener);
         /**
          * 设置数据集合
          */
@@ -69,6 +133,7 @@ public class TalkActivity extends AppCompatActivity {
          * 设置线性垂直布局管理器
          */
         LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setStackFromEnd(true);
         talkRecyclerview.setLayoutManager(manager);
         /**
          * 监听软键盘弹起
@@ -93,41 +158,60 @@ public class TalkActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setDataList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EMClient.getInstance().chatManager().removeMessageListener(msgListener);
+    }
+
     private void setDataList() {
         dataList.clear();
+        talkName.setText(getIntent().getStringExtra("talkName"));
         EMConversation conversation = EMClient.getInstance().chatManager().getConversation(getIntent().getStringExtra("to_chat_username"));
-        //获取此会话的所有消息
-        List<EMMessage> message = conversation.getAllMessages();
-        //SDK初始化加载的聊天记录为20条，到顶时需要去DB里获取更多
-        //获取startMsgId之前的pagesize条消息，此方法获取的messages SDK会自动存入到此会话中，APP中无需再次把获取到的messages添加到会话中
-        List<EMMessage> messages = conversation.loadMoreMsgFromDB(message.get(0).getMsgId(), 20);
-        for (int i = 0; i < messages.size(); i++) {
-            if (messages.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
-                TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
-                send.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
-                dataList.add(send);
-            } else {
-                TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
-                receive.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
-                dataList.add(receive);
+        if (conversation != null) {
+            //获取此会话的所有消息
+            List<EMMessage> message = conversation.getAllMessages();
+            //SDK初始化加载的聊天记录为20条，到顶时需要去DB里获取更多
+            //获取startMsgId之前的pagesize条消息，此方法获取的messages SDK会自动存入到此会话中，APP中无需再次把获取到的messages添加到会话中
+            List<EMMessage> messages = conversation.loadMoreMsgFromDB(message.get(0).getMsgId(), 20);
+            for (int i = 0; i < messages.size(); i++) {
+                if (messages.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
+                    TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
+                    send.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
+                    dataList.add(send);
+                } else {
+                    TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+                    receive.setTalkMsg(messages.get(i).getBody().toString().substring(5, messages.get(i).getBody().toString().length() - 1));
+                    dataList.add(receive);
+                }
             }
-            Log.d("getThisUserAllMessage", "messages: " + messages.get(i).toString());
-        }
-        for (int i = 0; i < message.size(); i++) {
-            if (message.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
-                TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
-                send.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
-                dataList.add(send);
-            } else {
-                TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
-                receive.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
-                dataList.add(receive);
+            for (int i = 0; i < message.size(); i++) {
+                if (message.get(i).getTo().equals(getIntent().getStringExtra("to_chat_username"))) {
+                    TalkEntity send = new TalkEntity(TalkEntity.TALK_SEND);
+                    send.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
+                    dataList.add(send);
+                } else {
+                    TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+                    receive.setTalkMsg(message.get(i).getBody().toString().substring(5, message.get(i).getBody().toString().length() - 1));
+                    dataList.add(receive);
+                }
+                talkRecyclerview.scrollToPosition(dataList.size() - 1);
             }
-            Log.d("getThisUserAllMessage", "message: " + message.get(i).toString());
+        } else {
+            TalkEntity receive = new TalkEntity(TalkEntity.TALK_RECEIVED);
+            receive.setTalkMsg("你好，有什么问题吗？");
+            dataList.add(receive);
+            talkRecyclerview.scrollToPosition(dataList.size() - 1);
         }
     }
 
-    @OnClick(R.id.talk_ok)
+    @OnClick({R.id.talk_ok, R.id.talk_back})
     public void talkOnClick(View view) {
         if (view.getId() == R.id.talk_ok) {
             String msg = talkInput.getText().toString();
@@ -145,6 +229,8 @@ public class TalkActivity extends AppCompatActivity {
                 talkRecyclerview.scrollToPosition(dataList.size() - 1);
                 talkInput.setText("");
             }
+        } else if (view.getId() == R.id.talk_back) {
+            TalkActivity.this.finish();
         }
     }
 

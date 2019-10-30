@@ -1,5 +1,7 @@
 package com.renoside.schoolresell.Entity;
 
+import java.util.List;
+
 public class ShopEntity {
 
     public static final int SHOP_BANNER = 1001;
@@ -8,6 +10,7 @@ public class ShopEntity {
     public static final int SHOP_GOODS_HINT = 1004;
     public static final int SHOP_GOODS = 1005;
     public static final int SHOP_CHANNEL = 1006;
+    public static final int SHOP_ADVERTISEMENT  = 1007;
 
     /**
      * 布局区分标志
@@ -20,7 +23,7 @@ public class ShopEntity {
     /**
      * 轮播图片地址集合
      */
-    private String shopImgs;
+    private List<Integer> shopImgs;
     /**
      * 图片地址
      */
@@ -56,6 +59,8 @@ public class ShopEntity {
                 return 10;
             case SHOP_CHANNEL:
                 return 2;
+            case SHOP_ADVERTISEMENT:
+                return 10;
             case SHOP_RECOMMEND_HINT:
                 return 10;
             case SHOP_RECOMMEND:
@@ -77,11 +82,11 @@ public class ShopEntity {
         this.shopId = shopId;
     }
 
-    public String getShopImgs() {
+    public List<Integer> getShopImgs() {
         return shopImgs;
     }
 
-    public void setShopImgs(String shopImgs) {
+    public void setShopImgs(List<Integer> shopImgs) {
         this.shopImgs = shopImgs;
     }
 
@@ -132,5 +137,4 @@ public class ShopEntity {
     public void setShopLikes(String shopLikes) {
         this.shopLikes = shopLikes;
     }
-
 }

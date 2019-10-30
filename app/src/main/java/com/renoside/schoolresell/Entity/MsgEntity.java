@@ -2,6 +2,8 @@ package com.renoside.schoolresell.Entity;
 
 public class MsgEntity {
 
+    private String msgKey;
+    private String msgId;
     /**
      * 信息头像
      */
@@ -22,6 +24,22 @@ public class MsgEntity {
      * 信息数量
      */
     private String msgNum;
+
+    public String getMsgKey() {
+        return msgKey;
+    }
+
+    public void setMsgKey(String msgKey) {
+        this.msgKey = msgKey;
+    }
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
+    }
 
     public String getMsgImg() {
         return msgImg;

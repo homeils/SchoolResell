@@ -3,6 +3,7 @@ package com.renoside.schoolresell.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 public class FragmentShop extends Fragment {
@@ -105,6 +107,17 @@ public class FragmentShop extends Fragment {
         bind.unbind();
     }
 
+    @OnClick(R.id.shop_ok)
+    public void shopOnClick(View view) {
+        /**
+         * 搜索商品
+         */
+        if (view.getId() == R.id.shop_ok) {
+            Log.d("searchGoods", shopSearch.getText());
+            searchGoods(shopSearch.getText());
+        }
+    }
+
     /**
      * 设置数据集合方法体
      */
@@ -122,6 +135,10 @@ public class FragmentShop extends Fragment {
                              * 轮播数据
                              */
                             ShopEntity banner = new ShopEntity(ShopEntity.SHOP_BANNER);
+                            List<Integer> images = new ArrayList<>();
+                            images.add(R.mipmap.banner_1);
+                            images.add(R.mipmap.banner_2);
+                            banner.setShopImgs(images);
                             dataList.add(banner);
                             /**
                              * 导航通道数据
@@ -132,6 +149,8 @@ public class FragmentShop extends Fragment {
                                 channel.setShopTitle(shopChannelTitles[i]);
                                 dataList.add(channel);
                             }
+                            ShopEntity advertisement = new ShopEntity(ShopEntity.SHOP_ADVERTISEMENT);
+                            dataList.add(advertisement);
                             /**
                              * 热门推荐提示
                              */
@@ -218,8 +237,7 @@ public class FragmentShop extends Fragment {
         rcvAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
-                Toast.makeText(getContext(), "onItemClick" + position, Toast.LENGTH_SHORT).show();
-                if ((position >= 7 && position < 11) || position > 11) {
+                if ((dataList.get(position).itemType == 1003 || dataList.get(position).itemType == 1005)) {
                     Bundle bundle = new Bundle();
                     bundle.putString("goodsId", dataList.get(position).getShopId());
                     Message msg = new Message();
@@ -251,5 +269,37 @@ public class FragmentShop extends Fragment {
             }
         }
         return result;
+    }
+
+    private void searchGoods(String keyCode) {
+        if (null != keyCode && !"".equals(keyCode)) {
+            OkGo.<String>get(ApiUrl.url + "/goods/" + keyCode + "/searchGoodsByKey")
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            if (response.code() == 200) {
+                                dataList.clear();
+                                JSONObject jsonObject = JSON.parseObject(response.body());
+                                Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
+                                });
+                                if (goodsObject != null && goodsObject.getGoods() != null && goodsObject.getGoods().size() != 0) {
+                                    for (int i = 0; i < goodsObject.getGoods().size(); i++) {
+                                        ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
+                                        goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
+                                        goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                        goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
+                                        goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
+                                        goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
+                                        goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
+                                        dataList.add(goods);
+                                    }
+                                    rcvAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                    });
+        } else {
+            setDataList();
+        }
     }
 }

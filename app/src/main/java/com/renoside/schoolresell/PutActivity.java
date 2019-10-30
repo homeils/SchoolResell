@@ -36,10 +36,6 @@ public class PutActivity extends AppCompatActivity {
 
     @BindView(R.id.put_header)
     LinearLayout putHeader;
-    @BindView(R.id.put_search)
-    TextView putSearch;
-//    @BindView(R.id.put_cancel)
-//    TextView putCancel;
     @BindView(R.id.put_recyclerview)
     RecyclerView putRecyclerview;
 

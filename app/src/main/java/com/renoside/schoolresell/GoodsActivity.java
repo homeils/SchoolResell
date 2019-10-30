@@ -181,9 +181,11 @@ public class GoodsActivity extends AppCompatActivity {
      *
      * @param view
      */
-    @OnClick({R.id.goods_phone, R.id.goods_like, R.id.goods_buy})
+    @OnClick({R.id.goods_back, R.id.goods_phone, R.id.goods_like, R.id.goods_buy})
     public void goodsOnClick(View view) {
-        if (view.getId() == R.id.goods_like) {
+        if (view.getId() == R.id.goods_back) {
+            GoodsActivity.this.finish();
+        } else if (view.getId() == R.id.goods_like) {
             /**
              * 收藏按钮监听
              */
@@ -191,12 +193,36 @@ public class GoodsActivity extends AppCompatActivity {
                 /**
                  * 收藏商品
                  */
-                goodsLike.setSelected(true);
+                OkGo.<String>post(ApiUrl.url + "/likes/" + goodsId)
+                        .headers("token", SharedPreferencesUtils.getUserLoginInfo(GoodsActivity.this).get("token"))
+                        .params("userId", SharedPreferencesUtils.getUserLoginInfo(GoodsActivity.this).get("userId"))
+                        .execute(new StringCallback() {
+                            @Override
+                            public void onSuccess(Response<String> response) {
+                                if (response.code() == 200) {
+                                    Toast.makeText(GoodsActivity.this, "收藏成功！", Toast.LENGTH_SHORT).show();
+                                    goodsLike.setSelected(true);
+                                } else if (response.code() == 403) {
+                                    Toast.makeText(GoodsActivity.this, "你已经收藏过该商品啦，去收藏列表看看吧！", Toast.LENGTH_SHORT).show();
+                                    goodsLike.setSelected(true);
+                                }
+                            }
+                        });
             } else {
                 /**
                  * 取消收藏
                  */
-                goodsLike.setSelected(false);
+                OkGo.<String>delete(ApiUrl.url + "/likes/" + goodsId)
+                        .headers("token", SharedPreferencesUtils.getUserLoginInfo(GoodsActivity.this).get("token"))
+                        .params("userId", SharedPreferencesUtils.getUserLoginInfo(GoodsActivity.this).get("userId"))
+                        .execute(new StringCallback() {
+                            @Override
+                            public void onSuccess(Response<String> response) {
+                                if (response.code() == 200) {
+                                    goodsLike.setSelected(false);
+                                }
+                            }
+                        });
             }
         } else if (view.getId() == R.id.goods_buy) {
             /**
@@ -244,7 +270,7 @@ public class GoodsActivity extends AppCompatActivity {
                                         }
                                         pd2.dismiss();
                                         Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
-                                        toast.setText("不能购买自己的商品哦");
+                                        toast.setText("不能购买自己的商品哦或者您已经下单啦");
                                         toast.show();
                                     }
                                 }
@@ -255,20 +281,25 @@ public class GoodsActivity extends AppCompatActivity {
             /**
              * 发起聊天
              */
-            OkGo.<String>get(ApiUrl.url + "/user/" + dataList.get(0).getSellerId() + "/username")
-                    .execute(new StringCallback() {
-                        @Override
-                        public void onSuccess(Response<String> response) {
-                            if (response.code() == 200) {
-                                JSONObject jsonObject = JSONObject.parseObject(response.body());
-                                String temp = jsonObject.getString("userName").replace("@", "");
-                                String toChatUsername = temp.replace(".", "");
-                                Intent intent = new Intent(GoodsActivity.this, TalkActivity.class);
-                                intent.putExtra("to_chat_username", toChatUsername);
-                                startActivity(intent);
+            if (dataList.get(0).getSellerId().equals(SharedPreferencesUtils.getUserLoginInfo(GoodsActivity.this).get("userId"))) {
+                Toast toast = Toast.makeText(GoodsActivity.this, null, Toast.LENGTH_SHORT);
+                toast.setText("不能向自己发起聊天啦");
+                toast.show();
+            } else {
+                OkGo.<String>get(ApiUrl.url + "/user/" + dataList.get(0).getSellerId() + "/loginName")
+                        .execute(new StringCallback() {
+                            @Override
+                            public void onSuccess(Response<String> response) {
+                                if (response.code() == 200) {
+                                    JSONObject jsonObject = JSONObject.parseObject(response.body());
+                                    String toChatUsername = jsonObject.getString("loginName").replace("@", "_");
+                                    Intent intent = new Intent(GoodsActivity.this, TalkActivity.class);
+                                    intent.putExtra("to_chat_username", toChatUsername);
+                                    startActivity(intent);
+                                }
                             }
-                        }
-                    });
+                        });
+            }
         }
     }
 

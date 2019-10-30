@@ -1,10 +1,17 @@
 package com.renoside.schoolresell.Adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -16,10 +23,11 @@ import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.loader.ImageLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder> {
+
+//    Typeface typeface = ResourcesCompat.getFont(mContext, R.font.appfont);
 
     /**
      * Same as QuickAdapter#QuickAdapter(Context,int) but with
@@ -38,6 +46,7 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
         getMultiTypeDelegate()
                 .registerItemType(ShopEntity.SHOP_BANNER, R.layout.shop_banner)
                 .registerItemType(ShopEntity.SHOP_CHANNEL, R.layout.shop_channel)
+                .registerItemType(ShopEntity.SHOP_ADVERTISEMENT, R.layout.shop_advertisement)
                 .registerItemType(ShopEntity.SHOP_RECOMMEND_HINT, R.layout.shop_hint)
                 .registerItemType(ShopEntity.SHOP_RECOMMEND, R.layout.shop_recommend)
                 .registerItemType(ShopEntity.SHOP_GOODS_HINT, R.layout.shop_hint)
@@ -48,13 +57,7 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
     protected void convert(@NonNull BaseViewHolder helper, ShopEntity item) {
         switch (helper.getItemViewType()) {
             case ShopEntity.SHOP_BANNER:
-                List<Integer> images = new ArrayList<>();
-                images.add(R.mipmap.banner_1);
-                images.add(R.mipmap.banner_2);
-                images.add(R.mipmap.banner_3);
-                images.add(R.mipmap.banner_4);
-                images.add(R.mipmap.banner_5);
-                Banner banner =  helper.getView(R.id.shop_banner);
+                Banner banner = helper.getView(R.id.shop_banner);
                 banner.setImageLoader(new ImageLoader() {
                     @Override
                     public void displayImage(Context context, Object path, ImageView imageView) {
@@ -62,7 +65,8 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
                     }
                 });
                 banner.setIndicatorGravity(BannerConfig.LEFT);
-                banner.setImages(images);
+                banner.setImages(item.getShopImgs());
+                banner.setDelayTime(3000);
                 banner.start();
                 break;
             case ShopEntity.SHOP_CHANNEL:
@@ -71,12 +75,19 @@ public class ShopRcvAdapter extends BaseQuickAdapter<ShopEntity, BaseViewHolder>
                 TextView shopChannelTitle = helper.getView(R.id.shop_channel_title);
                 shopChannelTitle.setText(item.getShopTitle());
                 break;
+            case ShopEntity.SHOP_ADVERTISEMENT:
+                TextView leftTitle = helper.getView(R.id.shop_advertisement_title1);
+                TextView rightTitle = helper.getView(R.id.shop_advertisement_title2);
+                Typeface advertiseFont = ResourcesCompat.getFont(mContext, R.font.advertisefont);
+                leftTitle.setTypeface(advertiseFont);
+                rightTitle.setTypeface(advertiseFont);
+                break;
             case ShopEntity.SHOP_RECOMMEND_HINT:
                 TextView shopRecommendHintLeft = helper.getView(R.id.shop_hint_left);
                 shopRecommendHintLeft.setTextColor(mContext.getResources().getColor(R.color.black));
                 shopRecommendHintLeft.setText("为您精选");
-                TextView shopRecommendHintRight = helper.getView(R.id.shop_hint_right);
-                shopRecommendHintRight.setText("换一批");
+//                TextView shopRecommendHintRight = helper.getView(R.id.shop_hint_right);
+//                shopRecommendHintRight.setText("换一批");
                 break;
             case ShopEntity.SHOP_RECOMMEND:
                 Glide.with(mContext).load(item.getShopImg()).into((ImageView) helper.getView(R.id.shop_recommend_img));

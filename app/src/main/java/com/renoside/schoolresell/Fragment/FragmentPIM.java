@@ -3,6 +3,7 @@ package com.renoside.schoolresell.Fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,6 +40,7 @@ import com.lzy.okgo.model.Response;
 import com.renoside.schoolresell.Adapter.PIMRcvAdapter;
 import com.renoside.schoolresell.Bean.UserInfo;
 import com.renoside.schoolresell.Entity.PIMEntity;
+import com.renoside.schoolresell.LikesActivity;
 import com.renoside.schoolresell.LoginActivity;
 import com.renoside.schoolresell.PutActivity;
 import com.renoside.schoolresell.R;
@@ -85,10 +88,10 @@ public class FragmentPIM extends Fragment {
     /**
      * 定义item图标和标题集合
      */
-    private Integer[] pimItemIcos1 = {R.drawable.pim_item_1, R.drawable.pim_item_2, R.drawable.pim_item_3};
-    private String[] pimItemTitles1 = {"账号管理", "好友", "在卖"};
-    private Integer[] pimItemIcos2 = {R.drawable.pim_item_5, R.drawable.pim_item_6, R.drawable.pim_item_7, R.drawable.pim_item_8};
-    private String[] pimItemTitles2 = {"安全中心", "设置", "隐私", "关于"};
+    private Integer[] pimItemIcos1 = {R.drawable.pim_item_1, R.drawable.pim_item_3};
+    private String[] pimItemTitles1 = {"账号管理", "在卖"};
+    private Integer[] pimItemIcos2 = {R.drawable.pim_item_5, R.drawable.pim_item_7, R.drawable.pim_item_8};
+    private String[] pimItemTitles2 = {"安全中心", "隐私", "关于"};
     final RxPermissions rxPermissions;
 
     public FragmentPIM(RxPermissions rxPermissions) {
@@ -238,7 +241,7 @@ public class FragmentPIM extends Fragment {
                     }
                 });
         dataList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             PIMEntity pimItem = new PIMEntity(PIMEntity.PIM_ITEM);
             pimItem.setPimImg(pimItemIcos1[i]);
             pimItem.setPimTitle(pimItemTitles1[i]);
@@ -250,7 +253,7 @@ public class FragmentPIM extends Fragment {
         dataList.add(pimLast1);
         PIMEntity pimSpan1 = new PIMEntity(PIMEntity.PIM_SPAN);
         dataList.add(pimSpan1);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             PIMEntity pimItem = new PIMEntity(PIMEntity.PIM_ITEM);
             pimItem.setPimImg(pimItemIcos2[i]);
             pimItem.setPimTitle(pimItemTitles2[i]);
@@ -406,51 +409,110 @@ public class FragmentPIM extends Fragment {
                         });
                         break;
                     /**
-                     * 好友
-                     */
-                    case 1:
-                        break;
-                    /**
                      * 在卖
                      */
-                    case 2:
-                        Intent intent = new Intent(getActivity(), PutActivity.class);
-                        startActivity(intent);
+                    case 1:
+                        Intent sell = new Intent(getActivity(), PutActivity.class);
+                        startActivity(sell);
                         break;
                     /**
                      * 我的收藏
                      */
-                    case 3:
+                    case 2:
+                        Intent likes = new Intent(getActivity(), LikesActivity.class);
+                        startActivity(likes);
                         break;
                     /**
                      * 安全中心
                      */
-                    case 5:
-                        break;
-                    /**
-                     * 设置
-                     */
-                    case 6:
+                    case 4:
+                        final List<Integer> choice = new ArrayList<>();
+                        final String[] items = {"隐藏个人签名", "隐藏地址", "隐藏联系电话"};
+                        boolean[] isSelect = {false, false, false};
+                        AlertDialog.Builder security = new AlertDialog.Builder(getContext())
+                                .setIcon(R.mipmap.app_icon)
+                                .setTitle("安全中心")
+                                .setMultiChoiceItems(items, isSelect, new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                                        if (b) {
+                                            choice.add(i);
+                                        } else {
+                                            choice.remove((Integer) i);
+                                        }
+                                    }
+                                }).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        StringBuilder str = new StringBuilder();
+                                        for (int j = 0; j < choice.size(); j++) {
+                                            str.append(items[choice.get(j)]);
+                                            if (j < choice.size() - 1)
+                                                str.append("、");
+                                        }
+                                        Toast.makeText(getContext(), "你选择了" + str, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                        security.create().show();
                         break;
                     /**
                      * 隐私
                      */
-                    case 7:
+                    case 5:
+                        AlertDialog privacy = new AlertDialog.Builder(getContext())
+                                .setTitle("隐私声明")
+                                .setMessage("除头像、昵称和一些您选填的个人信息(例如地址)外，我们不会向外透露您的任何其他个人信息，感谢使用闲趣！")
+                                .setIcon(R.mipmap.app_icon)
+                                .create();
+                        privacy.show();
                         break;
                     /**
                      * 关于
                      */
-                    case 8:
+                    case 6:
+                        AlertDialog about = new AlertDialog.Builder(getContext())
+                                .setTitle("关于闲趣")
+                                .setMessage("版本：v1.0\n开发者(小组)：renoside")
+                                .setIcon(R.mipmap.app_icon)
+                                .create();
+                        about.show();
                         break;
                     /**
                      * 通讯录
                      */
-                    case 9:
+                    case 7:
+                        android.app.AlertDialog.Builder contactBuilder = new android.app.AlertDialog.Builder(getContext());
+                        contactBuilder.setTitle("打开通讯录");
+                        contactBuilder.setMessage("这个功能还在测试中，您确定现在就要加入体验吗？");
+                        contactBuilder.setIcon(R.mipmap.app_icon);
+                        contactBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener() {//添加"Yes"按钮
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                rxPermissions.request(Manifest.permission.READ_CONTACTS)
+                                        .subscribe(granted -> {
+                                            if (granted) {
+                                                Toast.makeText(getContext(), "感谢您的加入，后续功能开放闲趣将第一时间提醒您", Toast.LENGTH_LONG).show();
+                                            } else {
+                                                Toast.makeText(getContext(), "您拒绝了请求通讯录的权限，功能测试完毕后会再次通知您，期待您的加入", Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                            }
+                        });
+                        contactBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {//添加取消
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getContext(), "您取消了请求通讯录的权限，功能测试完毕后会再次通知您，期待您的加入", Toast.LENGTH_LONG).show();
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        android.app.AlertDialog contact = contactBuilder
+                                .create();
+                        contact.show();
                         break;
                     /**
                      * 退出登录
                      */
-                    case 11:
+                    case 9:
                         EMClient.getInstance().logout(true);
                         Intent start = new Intent(getActivity(), LoginActivity.class);
                         SharedPreferencesUtils.saveIsFirstLogin(getContext(), true);

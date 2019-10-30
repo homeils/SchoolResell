@@ -40,14 +40,10 @@ import butterknife.Unbinder;
 
 public class FragmentOrder extends Fragment {
 
-    @BindView(R.id.order_search)
-    TextView orderSearch;
     @BindView(R.id.order_recyclerview)
     RecyclerView orderRecyclerview;
     @BindView(R.id.order_sell)
     TextView orderSell;
-//    @BindView(R.id.order_complete)
-//    TextView orderComplete;
     public Unbinder bind;
 
     private OrderRcvAdapter rcvAdapter;
