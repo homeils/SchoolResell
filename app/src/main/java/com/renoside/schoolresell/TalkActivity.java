@@ -3,12 +3,10 @@ package com.renoside.schoolresell;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +21,6 @@ import com.hyphenate.chat.EMConversation;
 import com.hyphenate.chat.EMMessage;
 import com.renoside.schoolresell.Adapter.TalkRcvAdapter;
 import com.renoside.schoolresell.Entity.TalkEntity;
-import com.renoside.schoolresell.Fragment.FragmentMsg;
 import com.renoside.schoolresell.Utils.EasemobUtils;
 
 import java.util.ArrayList;
@@ -83,6 +80,7 @@ public class TalkActivity extends AppCompatActivity {
                 dataList.add(receive);
                 Message msg = new Message();
                 msg.what = 200;
+                EMClient.getInstance().chatManager().getConversation(messages.get(i).conversationId()).markAllMessagesAsRead();
                 notify.sendMessage(msg);
             }
         }
@@ -217,7 +215,6 @@ public class TalkActivity extends AppCompatActivity {
             String msg = talkInput.getText().toString();
             if (!msg.equals("")) {
                 String toChatUsername = getIntent().getStringExtra("to_chat_username");
-                Log.d("send_message", "onSuccess: " + toChatUsername);
                 //创建一条文本消息，content为消息文字内容，toChatUsername为对方用户或者群聊的id，后文皆是如此
                 EMMessage message = EMMessage.createTxtSendMessage(msg, toChatUsername);
                 //发送消息

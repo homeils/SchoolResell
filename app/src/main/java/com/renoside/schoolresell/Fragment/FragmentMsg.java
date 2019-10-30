@@ -6,13 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,12 +27,10 @@ import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.renoside.schoolresell.Adapter.MsgRcvAdapter;
 import com.renoside.schoolresell.Entity.MsgEntity;
-import com.renoside.schoolresell.Entity.TalkEntity;
 import com.renoside.schoolresell.R;
 import com.renoside.schoolresell.TalkActivity;
 import com.renoside.schoolresell.Utils.ApiUrl;
 import com.renoside.schoolresell.Utils.EasemobUtils;
-import com.renoside.searchbox.SearchBox;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -80,7 +74,6 @@ public class FragmentMsg extends Fragment {
      * 环信的信息监听
      */
     EMMessageListener msgListener = new EMMessageListener() {
-
         @Override
         public void onMessageReceived(List<EMMessage> messages) {
             //收到消息
@@ -169,32 +162,11 @@ public class FragmentMsg extends Fragment {
          * 逐个显示会话
          */
         for (Map.Entry<String, EMConversation> entry : conversations.entrySet()) {
-            Handler handler = new Handler(){
-                @Override
-                public void handleMessage(@NonNull Message msg) {
-                    Bundle data = msg.getData();
-                    if (msg.what == 200) {
-                        //填装
-                        MsgEntity msgItem = new MsgEntity();
-                        msgItem.setMsgKey(data.getString("msgKey"));
-                        msgItem.setMsgImg(data.getString("msgImg"));
-                        msgItem.setMsgId(data.getString("msgId"));
-                        msgItem.setMsgTitle(data.getString("msgTitle"));
-                        msgItem.setMsgInfo(data.getString("msgInfo"));
-                        msgItem.setMsgTime(data.getString("msgTime"));
-                        msgItem.setMsgNum(data.getString("msgNum"));
-                        dataList.add(msgItem);
-                        Message message = new Message();
-                        message.what = 200;
-                        notify.sendMessage(message);
-                    }
-                }
-            };
             EMConversation conversation = EMClient.getInstance().chatManager().getConversation(entry.getKey());
             //会话发送方
             String msgKey = entry.getKey();
             String loginName = msgKey.replace("_", "@");
-            OkGo.<String>get(ApiUrl.url+"/user/"+loginName+"/getInfoByLoginName")
+            OkGo.<String>get(ApiUrl.url + "/user/" + loginName + "/getInfoByLoginName")
                     .execute(new StringCallback() {
                         @Override
                         public void onSuccess(Response<String> response) {
@@ -211,18 +183,24 @@ public class FragmentMsg extends Fragment {
                                 String msgTime = sdf.format(date);
                                 //会话未读信息数量
                                 String msgNum = String.valueOf(conversation.getUnreadMsgCount());
-                                Bundle bundle = new Bundle();
-                                bundle.putString("msgKey", msgKey);
-                                bundle.putString("msgId", conversation.conversationId());
-                                bundle.putString("msgImg", msgImg);
-                                bundle.putString("msgTitle", msgTitle);
-                                bundle.putString("msgInfo", msgInfo);
-                                bundle.putString("msgTime", msgTime);
-                                bundle.putString("msgNum", msgNum);
-                                Message msg = new Message();
-                                msg.what = 200;
-                                msg.setData(bundle);
-                                handler.sendMessage(msg);
+                                new Handler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //填装
+                                        MsgEntity msgItem = new MsgEntity();
+                                        msgItem.setMsgKey(msgKey);
+                                        msgItem.setMsgImg(msgImg);
+                                        msgItem.setMsgId(conversation.conversationId());
+                                        msgItem.setMsgTitle(msgTitle);
+                                        msgItem.setMsgInfo(msgInfo);
+                                        msgItem.setMsgTime(msgTime);
+                                        msgItem.setMsgNum(msgNum);
+                                        dataList.add(msgItem);
+                                        Message message = new Message();
+                                        message.what = 200;
+                                        notify.sendMessage(message);
+                                    }
+                                });
                             }
                         }
                     });
