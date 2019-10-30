@@ -45,6 +45,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class SellActivity extends AppCompatActivity {
 
@@ -89,6 +90,13 @@ public class SellActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 200 && resultCode == RESULT_OK) {
             imgUris = Matisse.obtainResult(data);
+        }
+    }
+
+    @OnClick(R.id.sell_back)
+    public void sellOnClick(View view) {
+        if (view.getId() == R.id.sell_back) {
+            SellActivity.this.finish();
         }
     }
 
