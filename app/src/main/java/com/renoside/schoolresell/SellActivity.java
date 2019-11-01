@@ -1,7 +1,9 @@
 package com.renoside.schoolresell;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
@@ -41,7 +43,9 @@ import com.zhihu.matisse.engine.impl.GlideEngine;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,6 +68,8 @@ public class SellActivity extends AppCompatActivity {
     @BindView(R.id.sell_title)
     TextView sellTitle;
 
+    private int typePosition = -1;
+    private int goodsType = -1;
     private int flag;
     private List<SellEntity> dataList;
     private SellRcvAdapter rcvAdapter;
@@ -117,6 +123,8 @@ public class SellActivity extends AppCompatActivity {
         SellEntity address = new SellEntity(SellEntity.SELL_BIG_ITEM);
         address.setSellHint("卖家地址*：");
         dataList.add(address);
+        SellEntity type = new SellEntity(SellEntity.SELL_TYPE_ITEM);
+        dataList.add(type);
         SellEntity pic = new SellEntity(SellEntity.SELL_PIC_ITEM);
         dataList.add(pic);
     }
@@ -146,13 +154,57 @@ public class SellActivity extends AppCompatActivity {
     }
 
     private void initListener() {
-        /**
-         * 添加图片按钮
-         */
         rcvAdapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
+                /**
+                 * 选择类型设置
+                 */
                 if (position == 5) {
+                    //默认选中第一个
+                    final String[] items = {"电子数码", "书籍笔记", "校园代劳", "人工服务", "急需转让"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SellActivity.this)
+                            .setIcon(R.mipmap.app_icon)
+                            .setTitle("选择商品类型")
+                            .setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    typePosition = i;
+                                }
+                            })
+                            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if (typePosition != -1) {
+                                        Toast.makeText(SellActivity.this, "你选择了" + items[typePosition], Toast.LENGTH_LONG).show();
+                                        switch (typePosition) {
+                                            case 0:
+                                                goodsType = 2001;
+                                                break;
+                                            case 1:
+                                                goodsType = 2002;
+                                                break;
+                                            case 2:
+                                                goodsType = 2003;
+                                                break;
+                                            case 3:
+                                                goodsType = 2004;
+                                                break;
+                                            case 4:
+                                                goodsType = 2005;
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }
+                                }
+                            });
+                    builder.create().show();
+                }
+                /**
+                 * 添加图片按钮
+                 */
+                if (position == 6) {
                     rxPermissions.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             .subscribe(granted -> {
                                 if (granted) {
@@ -179,98 +231,105 @@ public class SellActivity extends AppCompatActivity {
         /**
          * 发布按钮事件监听处理
          */
-        sellOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /**
-                 * 上架商品
-                 */
-                Handler upHandler = new Handler() {
-                    @Override
-                    public void handleMessage(Message msg) {
-                        Bundle bundle = msg.getData();
-                        switch (msg.what) {
-                            case 200:
-                                OkGo.<String>post(ApiUrl.url + "/goods/" + SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("userId"))
-                                        .headers("token", SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("token"))
-                                        .params("goodsImgs", bundle.getString("goodsImgs"))
-                                        .params("goodsName", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).getText()))
-                                        .params("goodsDescription", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).getText()))
-                                        .params("goodsPrice", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).getText()))
-                                        .params("goodsPhone", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).getText()))
-                                        .params("goodsAddress", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).getText()))
-                                        .execute(new StringCallback() {
-                                            @Override
-                                            public void onSuccess(Response<String> response) {
-                                                Toast toast = Toast.makeText(SellActivity.this, null, Toast.LENGTH_SHORT);
-                                                toast.setText("商品上架成功");
-                                                toast.show();
-                                                Intent intent = new Intent(SellActivity.this, HomeActivity.class);
-                                                startActivity(intent);
-                                            }
-                                        });
-                        }
+        if (getIntent().getStringExtra("goodsId") == null) {
+            sellOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (goodsType == -1) {
+                        Toast.makeText(SellActivity.this, "请选择商品类型哦", Toast.LENGTH_LONG).show();
+                    } else {
+                        /**
+                         * 上架商品
+                         */
+                        Handler upHandler = new Handler() {
+                            @Override
+                            public void handleMessage(Message msg) {
+                                Bundle bundle = msg.getData();
+                                switch (msg.what) {
+                                    case 200:
+                                        OkGo.<String>post(ApiUrl.url + "/goods/" + SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("userId"))
+                                                .headers("token", SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("token"))
+                                                .params("goodsImgs", bundle.getString("goodsImgs"))
+                                                .params("goodsType", goodsType)
+                                                .params("goodsName", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).getText()))
+                                                .params("goodsDescription", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).getText()))
+                                                .params("goodsPrice", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).getText()))
+                                                .params("goodsPhone", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).getText()))
+                                                .params("goodsAddress", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).getText()))
+                                                .execute(new StringCallback() {
+                                                    @Override
+                                                    public void onSuccess(Response<String> response) {
+                                                        Toast toast = Toast.makeText(SellActivity.this, null, Toast.LENGTH_SHORT);
+                                                        toast.setText("商品上架成功");
+                                                        toast.show();
+                                                        Intent intent = new Intent(SellActivity.this, HomeActivity.class);
+                                                        startActivity(intent);
+                                                    }
+                                                });
+                                }
+                            }
+                        };
+                        /**
+                         * 展示上传进度条
+                         */
+                        ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
+                        pd2.setTitle("上架商品");
+                        pd2.setIcon(R.mipmap.app_icon);
+                        pd2.setMessage("正在同步信息...");
+                        pd2.setCancelable(false);
+                        pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        pd2.show();
+                        /**
+                         * 新开线程得到,分割的储存好的图片路径
+                         */
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                flag = 0;
+                                for (int i = 0; i < imgUris.size(); i++) {
+                                    /**
+                                     * uri转file
+                                     */
+                                    Uri uri = imgUris.get(i);
+                                    String[] proj = {MediaStore.Images.Media.DATA};
+                                    Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+                                    int actual_image_column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                                    cursor.moveToFirst();
+                                    String img_path = cursor.getString(actual_image_column_index);
+                                    File file = new File(img_path);
+                                    /**
+                                     * 请求储存图片至smms图床
+                                     */
+                                    OkGo.<String>post("https://sm.ms/api/v2/upload")
+                                            .isMultipart(true)
+                                            .headers("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
+                                            .params("smfile", file)
+                                            .execute(new StringCallback() {
+                                                @Override
+                                                public void onSuccess(Response<String> response) {
+                                                    JSONObject jsonObject = JSONObject.parseObject(response.body());
+                                                    String url = jsonObject.getJSONObject("data").getString("url");
+                                                    goodsImgs.append(url + ",");
+                                                    flag++;
+                                                    if (flag == (imgUris.size())) {
+                                                        goodsImgs.deleteCharAt(goodsImgs.length() - 1);
+                                                        Message msg = new Message();
+                                                        msg.what = 200;
+                                                        Bundle bundle = new Bundle();
+                                                        bundle.putString("goodsImgs", String.valueOf(goodsImgs));
+                                                        msg.setData(bundle);
+                                                        upHandler.sendMessage(msg);
+                                                    }
+                                                }
+                                            });
+                                    cursor.close();
+                                }
+                            }
+                        }).start();
                     }
-                };
-                /**
-                 * 展示上传进度条
-                 */
-                ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
-                pd2.setTitle("上架商品");
-                pd2.setIcon(R.mipmap.app_icon);
-                pd2.setMessage("正在同步信息...");
-                pd2.setCancelable(false);
-                pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                pd2.show();
-                /**
-                 * 新开线程得到,分割的储存好的图片路径
-                 */
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        flag = 0;
-                        for (int i = 0; i < imgUris.size(); i++) {
-                            /**
-                             * uri转file
-                             */
-                            Uri uri = imgUris.get(i);
-                            String[] proj = {MediaStore.Images.Media.DATA};
-                            Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-                            int actual_image_column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                            cursor.moveToFirst();
-                            String img_path = cursor.getString(actual_image_column_index);
-                            File file = new File(img_path);
-                            /**
-                             * 请求储存图片至smms图床
-                             */
-                            OkGo.<String>post("https://sm.ms/api/v2/upload")
-                                    .isMultipart(true)
-                                    .headers("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
-                                    .params("smfile", file)
-                                    .execute(new StringCallback() {
-                                        @Override
-                                        public void onSuccess(Response<String> response) {
-                                            JSONObject jsonObject = JSONObject.parseObject(response.body());
-                                            String url = jsonObject.getJSONObject("data").getString("url");
-                                            goodsImgs.append(url + ",");
-                                            flag++;
-                                            if (flag == (imgUris.size())) {
-                                                goodsImgs.deleteCharAt(goodsImgs.length() - 1);
-                                                Message msg = new Message();
-                                                msg.what = 200;
-                                                Bundle bundle = new Bundle();
-                                                bundle.putString("goodsImgs", String.valueOf(goodsImgs));
-                                                msg.setData(bundle);
-                                                upHandler.sendMessage(msg);
-                                            }
-                                        }
-                                    });
-                            cursor.close();
-                        }
-                    }
-                }).start();
-            }
-        });
+                }
+            });
+        }
         /**
          * 修改按钮事件监听处理
          */
@@ -280,93 +339,98 @@ public class SellActivity extends AppCompatActivity {
             sellOk.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    /**
-                     * 修改商品信息
-                     */
-                    Handler updateHandler = new Handler() {
-                        @Override
-                        public void handleMessage(Message msg) {
-                            Bundle bundle = msg.getData();
-                            switch (msg.what) {
-                                case 200:
-                                    OkGo.<String>put(ApiUrl.url + "/goods/" + getIntent().getStringExtra("goodsId"))
-                                            .headers("token", SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("token"))
-                                            .params("goodsImgs", bundle.getString("goodsImgs"))
-                                            .params("goodsName", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).getText()))
-                                            .params("goodsDescription", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).getText()))
-                                            .params("goodsPrice", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).getText()))
-                                            .params("goodsPhone", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).getText()))
-                                            .params("goodsAddress", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).getText()))
+                    if (goodsType != -1) {
+                        /**
+                         * 修改商品信息
+                         */
+                        Handler updateHandler = new Handler() {
+                            @Override
+                            public void handleMessage(Message msg) {
+                                Bundle bundle = msg.getData();
+                                switch (msg.what) {
+                                    case 200:
+                                        OkGo.<String>put(ApiUrl.url + "/goods/" + getIntent().getStringExtra("goodsId"))
+                                                .headers("token", SharedPreferencesUtils.getUserLoginInfo(SellActivity.this).get("token"))
+                                                .params("goodsImgs", bundle.getString("goodsImgs"))
+                                                .params("goodsType", goodsType)
+                                                .params("goodsName", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 0, R.id.sell_small_content)).getText()))
+                                                .params("goodsDescription", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 1, R.id.sell_big_content)).getText()))
+                                                .params("goodsPrice", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 2, R.id.sell_small_content)).getText()))
+                                                .params("goodsPhone", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 3, R.id.sell_small_content)).getText()))
+                                                .params("goodsAddress", String.valueOf(((EditText) rcvAdapter.getViewByPosition(sellRecyclerview, 4, R.id.sell_big_content)).getText()))
+                                                .execute(new StringCallback() {
+                                                    @Override
+                                                    public void onSuccess(Response<String> response) {
+                                                        Toast toast = Toast.makeText(SellActivity.this, null, Toast.LENGTH_SHORT);
+                                                        toast.setText("商品修改成功");
+                                                        toast.show();
+                                                        Intent intent = new Intent(SellActivity.this, HomeActivity.class);
+                                                        startActivity(intent);
+                                                    }
+                                                });
+                                }
+                            }
+                        };
+                        /**
+                         * 展示上传进度条
+                         */
+                        ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
+                        pd2.setTitle("修改商品");
+                        pd2.setIcon(R.mipmap.ic_launcher_round);
+                        pd2.setMessage("正在同步信息...");
+                        pd2.setCancelable(false);
+                        pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        pd2.show();
+                        /**
+                         * 新开线程得到,分割的储存好的图片路径
+                         */
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                flag = 0;
+                                for (int i = 0; i < imgUris.size(); i++) {
+                                    /**
+                                     * uri转file
+                                     */
+                                    Uri uri = imgUris.get(i);
+                                    String[] proj = {MediaStore.Images.Media.DATA};
+                                    Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
+                                    int actual_image_column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                                    cursor.moveToFirst();
+                                    String img_path = cursor.getString(actual_image_column_index);
+                                    File file = new File(img_path);
+                                    /**
+                                     * 请求储存图片至smms图床
+                                     */
+                                    OkGo.<String>post("https://sm.ms/api/v2/upload")
+                                            .isMultipart(true)
+                                            .headers("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
+                                            .params("smfile", file)
                                             .execute(new StringCallback() {
                                                 @Override
                                                 public void onSuccess(Response<String> response) {
-                                                    Toast toast = Toast.makeText(SellActivity.this, null, Toast.LENGTH_SHORT);
-                                                    toast.setText("商品修改成功");
-                                                    toast.show();
-                                                    Intent intent = new Intent(SellActivity.this, HomeActivity.class);
-                                                    startActivity(intent);
+                                                    JSONObject jsonObject = JSONObject.parseObject(response.body());
+                                                    String url = jsonObject.getJSONObject("data").getString("url");
+                                                    goodsImgs.append(url + ",");
+                                                    flag++;
+                                                    if (flag == (imgUris.size())) {
+                                                        goodsImgs.deleteCharAt(goodsImgs.length() - 1);
+                                                        Message msg = new Message();
+                                                        msg.what = 200;
+                                                        Bundle bundle = new Bundle();
+                                                        bundle.putString("goodsImgs", String.valueOf(goodsImgs));
+                                                        msg.setData(bundle);
+                                                        updateHandler.sendMessage(msg);
+                                                    }
                                                 }
                                             });
+                                    cursor.close();
+                                }
                             }
-                        }
-                    };
-                    /**
-                     * 展示上传进度条
-                     */
-                    ProgressDialog pd2 = new ProgressDialog(SellActivity.this);
-                    pd2.setTitle("修改商品");
-                    pd2.setIcon(R.mipmap.ic_launcher_round);
-                    pd2.setMessage("正在同步信息...");
-                    pd2.setCancelable(false);
-                    pd2.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    pd2.show();
-                    /**
-                     * 新开线程得到,分割的储存好的图片路径
-                     */
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            flag = 0;
-                            for (int i = 0; i < imgUris.size(); i++) {
-                                /**
-                                 * uri转file
-                                 */
-                                Uri uri = imgUris.get(i);
-                                String[] proj = {MediaStore.Images.Media.DATA};
-                                Cursor cursor = getContentResolver().query(uri, proj, null, null, null);
-                                int actual_image_column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-                                cursor.moveToFirst();
-                                String img_path = cursor.getString(actual_image_column_index);
-                                File file = new File(img_path);
-                                /**
-                                 * 请求储存图片至smms图床
-                                 */
-                                OkGo.<String>post("https://sm.ms/api/v2/upload")
-                                        .isMultipart(true)
-                                        .headers("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0")
-                                        .params("smfile", file)
-                                        .execute(new StringCallback() {
-                                            @Override
-                                            public void onSuccess(Response<String> response) {
-                                                JSONObject jsonObject = JSONObject.parseObject(response.body());
-                                                String url = jsonObject.getJSONObject("data").getString("url");
-                                                goodsImgs.append(url + ",");
-                                                flag++;
-                                                if (flag == (imgUris.size())) {
-                                                    goodsImgs.deleteCharAt(goodsImgs.length() - 1);
-                                                    Message msg = new Message();
-                                                    msg.what = 200;
-                                                    Bundle bundle = new Bundle();
-                                                    bundle.putString("goodsImgs", String.valueOf(goodsImgs));
-                                                    msg.setData(bundle);
-                                                    updateHandler.sendMessage(msg);
-                                                }
-                                            }
-                                        });
-                                cursor.close();
-                            }
-                        }
-                    }).start();
+                        }).start();
+                    } else {
+                        Toast.makeText(SellActivity.this, "请选择商品类型哦", Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }

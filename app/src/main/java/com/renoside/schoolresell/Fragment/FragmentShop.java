@@ -246,6 +246,26 @@ public class FragmentShop extends Fragment {
                     GoodsActivity.handler.sendMessage(msg);
                     Intent intent = new Intent(getActivity(), GoodsActivity.class);
                     startActivity(intent);
+                } else if ((dataList.get(position)).itemType == 1006) {
+                    switch (dataList.get(position).getShopTitle()) {
+                        case "电子专区":
+                            searchGoodsByChannel("2001");
+                            break;
+                        case "书籍笔记":
+                            searchGoodsByChannel("2002");
+                            break;
+                        case "校园代劳":
+                            searchGoodsByChannel("2003");
+                            break;
+                        case "人工服务":
+                            searchGoodsByChannel("2004");
+                            break;
+                        case "急需转让":
+                            searchGoodsByChannel("2005");
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         });
@@ -300,6 +320,36 @@ public class FragmentShop extends Fragment {
                     });
         } else {
             setDataList();
+        }
+    }
+
+    private void searchGoodsByChannel(String goodsType) {
+        if (null != goodsType && !"".equals(goodsType)) {
+            OkGo.<String>get(ApiUrl.url + "/types/" + goodsType)
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(Response<String> response) {
+                            if (response.code() == 200) {
+                                dataList.clear();
+                                JSONObject jsonObject = JSON.parseObject(response.body());
+                                Goods goodsObject = JSON.parseObject(jsonObject.toJSONString(), new TypeReference<Goods>() {
+                                });
+                                if (goodsObject != null && goodsObject.getGoods() != null && goodsObject.getGoods().size() != 0) {
+                                    for (int i = 0; i < goodsObject.getGoods().size(); i++) {
+                                        ShopEntity goods = new ShopEntity(ShopEntity.SHOP_GOODS);
+                                        goods.setShopId(goodsObject.getGoods().get(i).getGoodsId());
+                                        goods.setShopImg(goodsObject.getGoods().get(i).getGoodsImgs().get(0).getGoodsImg());
+                                        goods.setShopTitle(goodsObject.getGoods().get(i).getGoodsName());
+                                        goods.setShopDescription(goodsObject.getGoods().get(i).getGoodsDescription());
+                                        goods.setShopPrice(String.valueOf(goodsObject.getGoods().get(i).getGoodsPrice()));
+                                        goods.setShopLikes(String.valueOf(goodsObject.getGoods().get(i).getGoodsLikes()));
+                                        dataList.add(goods);
+                                    }
+                                    rcvAdapter.notifyDataSetChanged();
+                                }
+                            }
+                        }
+                    });
         }
     }
 }

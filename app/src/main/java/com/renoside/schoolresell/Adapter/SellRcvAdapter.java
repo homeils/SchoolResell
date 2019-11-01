@@ -25,7 +25,8 @@ public class SellRcvAdapter extends BaseQuickAdapter<SellEntity, BaseViewHolder>
         getMultiTypeDelegate()
                 .registerItemType(SellEntity.SELL_SMALL_ITEM, R.layout.sell_small_item)
                 .registerItemType(SellEntity.SELL_BIG_ITEM, R.layout.sell_big_item)
-                .registerItemType(SellEntity.SELL_PIC_ITEM, R.layout.sell_pic_item);
+                .registerItemType(SellEntity.SELL_PIC_ITEM, R.layout.sell_pic_item)
+                .registerItemType(SellEntity.SELL_TYPE_ITEM, R.layout.sell_type_item);
     }
 
     @Override
@@ -36,8 +37,6 @@ public class SellRcvAdapter extends BaseQuickAdapter<SellEntity, BaseViewHolder>
                 break;
             case SellEntity.SELL_BIG_ITEM:
                 helper.setText(R.id.sell_big_hint, item.getSellHint());
-                break;
-            case SellEntity.SELL_PIC_ITEM:
                 break;
             default:
                 break;
